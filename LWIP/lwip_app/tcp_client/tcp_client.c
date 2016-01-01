@@ -186,9 +186,15 @@ void handle_message_task(void *arg)
 				}
 				i++;
 				account[j] = '\0';
-				if(strcmp(account, "975559549") != 0) //不是该机器的主人
+				if((strcmp(account, MASTER) != 0)&&(strcmp(account, SLAVE) != 0)) //排除非SLAVE和MASTER的信息
 				{
-					break;
+					/*当前指令无效,跳转到下一个指令*/
+					while((tcp_client_recvbuf[i] != '\0') && (tcp_client_recvbuf[i] != COMMAND_END)&&(i<TCP_CLIENT_RX_BUFSIZE))//msg[i]=END
+          {
+                i++;
+          }
+          i++;
+          continue;
 				}
 				/*账户认证成功,获得子类型*/
 				if(tcp_client_recvbuf[i+1] == COMMAND_SEPERATOR)//判断是否为type

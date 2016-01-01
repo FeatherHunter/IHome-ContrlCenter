@@ -31,13 +31,22 @@
 #define COMMAND_CONTRL 2
 #define COMMAND_RESULT 3
 #define MAN_LOGIN 11
+#define CTL_LAMP  21
+#define CTL_GET   22
 #define RES_LOGIN 31
+#define RES_LAMP  32
+#define RES_TEMP  33
+#define RES_HUMI  34
 #define LOGIN_SUCCESS 1
 #define LOGIN_FAILED  2
- 
+#define LAMP_ON  1
+#define LAMP_OFF 2
  
 #define COMMAND_END 30
 #define COMMAND_SEPERATOR 31
+
+#define MASTER "975559549"
+#define SLAVE  "975559549h"
 
 extern u8 isConnected;
 extern u8 isAuthed;
