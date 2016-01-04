@@ -92,4 +92,5 @@
 ..\OBJ\lwip_comm.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
 ..\OBJ\lwip_comm.o: ..\SOFTWARE\ihome_function.h
 ..\OBJ\lwip_comm.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
+..\OBJ\lwip_comm.o: ..\HARDWARE\DHT11\dht11.h
 ..\OBJ\lwip_comm.o: ..\USER\message_queue.h

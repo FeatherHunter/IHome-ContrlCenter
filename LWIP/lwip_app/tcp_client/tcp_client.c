@@ -166,10 +166,10 @@ void handle_message_task(void *arg)
 		{
 			OSTimeDlyHMSM(0,0,2,0);//没有连接好，等待2S链接
 		}
-		if(tcp_client_flag&1<<6)//是否收到数据?
+		if(tcp_client_flag&(1<<6))//是否收到数据?
 		{
 			printf("handle message task!\n");
-			LCD_ShowString(30,250,lcddev.width-30,lcddev.height-230,16,tcp_client_recvbuf);//显示接收到的数据	
+			LCD_ShowString(30,250,lcddev.width-30,lcddev.height-230,16,tcp_client_recvbuf);//显示接收到的数据
 			i = 0;
 			/*解析接收到的信息(可能包含多个指令)*/
 			while((tcp_client_recvbuf[i]!='\0')&&(i<TCP_CLIENT_RX_BUFSIZE))
@@ -218,7 +218,7 @@ void handle_message_task(void *arg)
           i++;
           continue;
 				}
-				/*账户认证成功,获得子类型*/
+				/*获得子类型*/
 				if(tcp_client_recvbuf[i+1] == COMMAND_SEPERATOR)//判断是否为type
 				{
 					subtype = tcp_client_recvbuf[i];
@@ -294,7 +294,7 @@ void handle_message_task(void *arg)
 						}
 						i++;
 						account[j] = '\0';
-						printf("ID：%s ", account);
+						//printf("device ID:%s\n", account);
 						if(res == RES_TEMP)
 						{
 							/*--------------发送TEMP给DHT11 TSAK------------------------------*/
@@ -385,7 +385,8 @@ void handle_message_task(void *arg)
 				}//end of command contrl
 			}
 			
-			LCD_ShowString(30,250,lcddev.width-30,lcddev.height-230,16,tcp_client_recvbuf);//显示接收到的数据		
+			LCD_ShowString(30,250,lcddev.width-30,lcddev.height-230,16,tcp_client_recvbuf);//显示接收到的数据
+			
 			tcp_client_flag&=~(1<<6);//标记数据已经被处理了.
 		}
 	}// end of while(1)

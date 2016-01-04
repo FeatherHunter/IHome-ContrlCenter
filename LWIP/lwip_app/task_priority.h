@@ -23,7 +23,7 @@ void tcp_connect_task(void *arg);
 
 /*接受信息并且处理*/
 #define HANDLE_MSG_TASK_PRIO       		9
-#define HANDLE_MSG_STK_SIZE  		    128
+#define HANDLE_MSG_STK_SIZE  		    256
 extern OS_STK HANDLE_MSG_TASK_STK[HANDLE_MSG_STK_SIZE];	
 void handle_message_task(void *arg);
 

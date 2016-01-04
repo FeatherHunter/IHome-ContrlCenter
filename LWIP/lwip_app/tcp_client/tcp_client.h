@@ -20,10 +20,10 @@
 #define MAN_LOGIN 11
 #define CTL_LAMP  21
 #define CTL_GET   22
-#define RES_LOGIN 31
-#define RES_LAMP  32
-#define RES_TEMP  33
-#define RES_HUMI  34
+#define RES_LOGIN 32
+#define RES_LAMP  33
+#define RES_TEMP  34
+#define RES_HUMI  35
 #define LOGIN_SUCCESS 1
 #define LOGIN_FAILED  2
 #define LAMP_ON  1

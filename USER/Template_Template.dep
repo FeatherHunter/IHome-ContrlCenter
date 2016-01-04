@@ -1,5 +1,5 @@
 Dependencies for Project 'Template', Target 'Template': (DO NOT MODIFY !)
-F (.\main.c)(0x568A476F)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\KEY -I..\HARDWARE\LCD -I..\HARDWARE\ETHERNET -I..\HARDWARE\TIMER -I..\HARDWARE\LED -I..\HARDWARE\SRAM -I..\FWLIB\STM32F4x7_ETH_Driver\inc -I..\MALLOC -I..\USMART -I..\LWIP -I..\LWIP\arch -I..\LWIP\lwip_header -I..\LWIP\app\TCP_Client -I..\LWIP\lwip_app\lwip_comm -I..\LWIP\lwip-1.4.1\src\include -I..\LWIP\lwip-1.4.1\src\include\ipv4 -I..\LWIP\lwip-1.4.1\src\include\lwip -I..\LWIP\lwip-1.4.1\src\include\netif -I..\UCOSII\CONFIG -I..\UCOSII\CORE -I..\UCOSII\PORT -I..\LWIP\lwip_app -I..\LWIP\lwip_app\tcp_client -I..\SOFTWARE -I..\HARDWARE\DHT11 -I D:\Keil_ARM\ARM\RV31\INC -I D:\Keil_ARM\ARM\CMSIS\Include -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -o "..\OBJ\main.o" --omf_browse "..\OBJ\main.crf" --depend "..\OBJ\main.d")
+F (.\main.c)(0x568A4E5D)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\KEY -I..\HARDWARE\LCD -I..\HARDWARE\ETHERNET -I..\HARDWARE\TIMER -I..\HARDWARE\LED -I..\HARDWARE\SRAM -I..\FWLIB\STM32F4x7_ETH_Driver\inc -I..\MALLOC -I..\USMART -I..\LWIP -I..\LWIP\arch -I..\LWIP\lwip_header -I..\LWIP\app\TCP_Client -I..\LWIP\lwip_app\lwip_comm -I..\LWIP\lwip-1.4.1\src\include -I..\LWIP\lwip-1.4.1\src\include\ipv4 -I..\LWIP\lwip-1.4.1\src\include\lwip -I..\LWIP\lwip-1.4.1\src\include\netif -I..\UCOSII\CONFIG -I..\UCOSII\CORE -I..\UCOSII\PORT -I..\LWIP\lwip_app -I..\LWIP\lwip_app\tcp_client -I..\SOFTWARE -I..\HARDWARE\DHT11 -I D:\Keil_ARM\ARM\RV31\INC -I D:\Keil_ARM\ARM\CMSIS\Include -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -o "..\OBJ\main.o" --omf_browse "..\OBJ\main.crf" --depend "..\OBJ\main.d")
 I (..\SYSTEM\sys\sys.h)(0x5531CA40)
 I (..\USER\stm32f4xx.h)(0x5447C0B7)
 I (..\CORE\core_cm4.h)(0x527B7158)
@@ -44,7 +44,7 @@ I (..\LWIP\lwip_app\lwip_comm\lwip_comm.h)(0x5683A559)
 I (..\HARDWARE\ETHERNET\lan8720.h)(0x54476271)
 I (..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth.h)(0x53EE02B1)
 I (..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth_conf.h)(0x54436DF6)
-I (..\LWIP\lwip_app\task_priority.h)(0x568A43AB)
+I (..\LWIP\lwip_app\task_priority.h)(0x568A6E5D)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/debug.h)(0x50CEF616)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/arch.h)(0x50CEF616)
 I (..\LWIP\arch/cc.h)(0x5447398C)
@@ -78,9 +78,9 @@ I (..\HARDWARE\LCD\lcd.h)(0x56590D6A)
 I (..\HARDWARE\SRAM\sram.h)(0x56625A05)
 I (..\MALLOC\malloc.h)(0x5404262B)
 I (..\LWIP\lwip_app\tcp_client\tcp_client.h)(0x568A470C)
-I (..\SOFTWARE\ihome_function.h)(0x56888CD3)
-I (..\USER\message_queue.h)(0x568A471F)
+I (..\SOFTWARE\ihome_function.h)(0x568A5185)
 I (..\HARDWARE\DHT11\dht11.h)(0x565511D6)
+I (..\USER\message_queue.h)(0x568A534F)
 F (.\stm32f4xx_it.c)(0x5449BF98)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\KEY -I..\HARDWARE\LCD -I..\HARDWARE\ETHERNET -I..\HARDWARE\TIMER -I..\HARDWARE\LED -I..\HARDWARE\SRAM -I..\FWLIB\STM32F4x7_ETH_Driver\inc -I..\MALLOC -I..\USMART -I..\LWIP -I..\LWIP\arch -I..\LWIP\lwip_header -I..\LWIP\app\TCP_Client -I..\LWIP\lwip_app\lwip_comm -I..\LWIP\lwip-1.4.1\src\include -I..\LWIP\lwip-1.4.1\src\include\ipv4 -I..\LWIP\lwip-1.4.1\src\include\lwip -I..\LWIP\lwip-1.4.1\src\include\netif -I..\UCOSII\CONFIG -I..\UCOSII\CORE -I..\UCOSII\PORT -I..\LWIP\lwip_app -I..\LWIP\lwip_app\tcp_client -I..\SOFTWARE -I..\HARDWARE\DHT11 -I D:\Keil_ARM\ARM\RV31\INC -I D:\Keil_ARM\ARM\CMSIS\Include -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -o "..\OBJ\stm32f4xx_it.o" --omf_browse "..\OBJ\stm32f4xx_it.crf" --depend "..\OBJ\stm32f4xx_it.d")
 I (stm32f4xx_it.h)(0x5447C0B7)
 I (stm32f4xx.h)(0x5447C0B7)
@@ -154,17 +154,8 @@ I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_can.h)(0x53DBAFAD)
 I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dac.h)(0x53DBAFAD)
 I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x53DBAFAD)
 I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x53DBAFAD)
-F (..\SOFTWARE\ihome_function.c)(0x568A441B)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\KEY -I..\HARDWARE\LCD -I..\HARDWARE\ETHERNET -I..\HARDWARE\TIMER -I..\HARDWARE\LED -I..\HARDWARE\SRAM -I..\FWLIB\STM32F4x7_ETH_Driver\inc -I..\MALLOC -I..\USMART -I..\LWIP -I..\LWIP\arch -I..\LWIP\lwip_header -I..\LWIP\app\TCP_Client -I..\LWIP\lwip_app\lwip_comm -I..\LWIP\lwip-1.4.1\src\include -I..\LWIP\lwip-1.4.1\src\include\ipv4 -I..\LWIP\lwip-1.4.1\src\include\lwip -I..\LWIP\lwip-1.4.1\src\include\netif -I..\UCOSII\CONFIG -I..\UCOSII\CORE -I..\UCOSII\PORT -I..\LWIP\lwip_app -I..\LWIP\lwip_app\tcp_client -I..\SOFTWARE -I..\HARDWARE\DHT11 -I D:\Keil_ARM\ARM\RV31\INC -I D:\Keil_ARM\ARM\CMSIS\Include -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -o "..\OBJ\ihome_function.o" --omf_browse "..\OBJ\ihome_function.crf" --depend "..\OBJ\ihome_function.d")
-I (..\SOFTWARE\ihome_function.h)(0x56888CD3)
-I (..\UCOSII\CONFIG\includes.h)(0x53D31A75)
-I (D:\Keil_ARM\ARM\ARMCC\bin\..\include\stdio.h)(0x50F96150)
-I (D:\Keil_ARM\ARM\ARMCC\bin\..\include\string.h)(0x50F96150)
-I (D:\Keil_ARM\ARM\ARMCC\bin\..\include\ctype.h)(0x50F96150)
-I (D:\Keil_ARM\ARM\ARMCC\bin\..\include\stdlib.h)(0x50F96150)
-I (D:\Keil_ARM\ARM\ARMCC\bin\..\include\stdarg.h)(0x50F9614E)
-I (..\UCOSII\CORE\ucos_ii.h)(0x53D0E053)
-I (..\UCOSII\CONFIG\os_cfg.h)(0x53D9B326)
-I (..\UCOSII\PORT\os_cpu.h)(0x53DBAD97)
+F (..\SOFTWARE\ihome_function.c)(0x568A830F)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\KEY -I..\HARDWARE\LCD -I..\HARDWARE\ETHERNET -I..\HARDWARE\TIMER -I..\HARDWARE\LED -I..\HARDWARE\SRAM -I..\FWLIB\STM32F4x7_ETH_Driver\inc -I..\MALLOC -I..\USMART -I..\LWIP -I..\LWIP\arch -I..\LWIP\lwip_header -I..\LWIP\app\TCP_Client -I..\LWIP\lwip_app\lwip_comm -I..\LWIP\lwip-1.4.1\src\include -I..\LWIP\lwip-1.4.1\src\include\ipv4 -I..\LWIP\lwip-1.4.1\src\include\lwip -I..\LWIP\lwip-1.4.1\src\include\netif -I..\UCOSII\CONFIG -I..\UCOSII\CORE -I..\UCOSII\PORT -I..\LWIP\lwip_app -I..\LWIP\lwip_app\tcp_client -I..\SOFTWARE -I..\HARDWARE\DHT11 -I D:\Keil_ARM\ARM\RV31\INC -I D:\Keil_ARM\ARM\CMSIS\Include -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -o "..\OBJ\ihome_function.o" --omf_browse "..\OBJ\ihome_function.crf" --depend "..\OBJ\ihome_function.d")
+I (..\LWIP\lwip_app\task_priority.h)(0x568A6E5D)
 I (..\SYSTEM\sys\sys.h)(0x5531CA40)
 I (..\USER\stm32f4xx.h)(0x5447C0B7)
 I (..\CORE\core_cm4.h)(0x527B7158)
@@ -200,11 +191,19 @@ I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_can.h)(0x53DBAFAD)
 I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dac.h)(0x53DBAFAD)
 I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x53DBAFAD)
 I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x53DBAFAD)
-I (..\LWIP\lwip_app\tcp_client\tcp_client.h)(0x568A470C)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/debug.h)(0x50CEF616)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/arch.h)(0x50CEF616)
 I (..\LWIP\arch/cc.h)(0x5447398C)
 I (..\LWIP\arch/cpu.h)(0x51EE8A19)
+I (D:\Keil_ARM\ARM\ARMCC\bin\..\include\stdio.h)(0x50F96150)
+I (..\UCOSII\CONFIG\includes.h)(0x53D31A75)
+I (D:\Keil_ARM\ARM\ARMCC\bin\..\include\string.h)(0x50F96150)
+I (D:\Keil_ARM\ARM\ARMCC\bin\..\include\ctype.h)(0x50F96150)
+I (D:\Keil_ARM\ARM\ARMCC\bin\..\include\stdlib.h)(0x50F96150)
+I (D:\Keil_ARM\ARM\ARMCC\bin\..\include\stdarg.h)(0x50F9614E)
+I (..\UCOSII\CORE\ucos_ii.h)(0x53D0E053)
+I (..\UCOSII\CONFIG\os_cfg.h)(0x53D9B326)
+I (..\UCOSII\PORT\os_cpu.h)(0x53DBAD97)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/opt.h)(0x540E5D16)
 I (..\LWIP\lwip_app\lwip_comm\lwipopts.h)(0x54572C86)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/stats.h)(0x50CEFB5E)
@@ -223,9 +222,11 @@ I (..\LWIP\lwip_app\lwip_comm\lwip_comm.h)(0x5683A559)
 I (..\HARDWARE\ETHERNET\lan8720.h)(0x54476271)
 I (..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth.h)(0x53EE02B1)
 I (..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth_conf.h)(0x54436DF6)
-I (..\LWIP\lwip_app\task_priority.h)(0x568A43AB)
+I (..\SOFTWARE\ihome_function.h)(0x568A5185)
+I (..\LWIP\lwip_app\tcp_client\tcp_client.h)(0x568A470C)
 I (..\MALLOC\malloc.h)(0x5404262B)
-I (..\USER\message_queue.h)(0x568A471F)
+I (..\USER\message_queue.h)(0x568A534F)
+I (..\HARDWARE\DHT11\dht11.h)(0x565511D6)
 I (..\HARDWARE\LED\led.h)(0x5688A778)
 F (..\HARDWARE\KEY\key.c)(0x56526016)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\KEY -I..\HARDWARE\LCD -I..\HARDWARE\ETHERNET -I..\HARDWARE\TIMER -I..\HARDWARE\LED -I..\HARDWARE\SRAM -I..\FWLIB\STM32F4x7_ETH_Driver\inc -I..\MALLOC -I..\USMART -I..\LWIP -I..\LWIP\arch -I..\LWIP\lwip_header -I..\LWIP\app\TCP_Client -I..\LWIP\lwip_app\lwip_comm -I..\LWIP\lwip-1.4.1\src\include -I..\LWIP\lwip-1.4.1\src\include\ipv4 -I..\LWIP\lwip-1.4.1\src\include\lwip -I..\LWIP\lwip-1.4.1\src\include\netif -I..\UCOSII\CONFIG -I..\UCOSII\CORE -I..\UCOSII\PORT -I..\LWIP\lwip_app -I..\LWIP\lwip_app\tcp_client -I..\SOFTWARE -I..\HARDWARE\DHT11 -I D:\Keil_ARM\ARM\RV31\INC -I D:\Keil_ARM\ARM\CMSIS\Include -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -o "..\OBJ\key.o" --omf_browse "..\OBJ\key.crf" --depend "..\OBJ\key.d")
 I (..\HARDWARE\KEY\key.h)(0x56525E99)
@@ -344,7 +345,7 @@ I (..\LWIP\lwip_app\lwip_comm\lwip_comm.h)(0x5683A559)
 I (..\HARDWARE\ETHERNET\lan8720.h)(0x54476271)
 I (..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth.h)(0x53EE02B1)
 I (..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth_conf.h)(0x54436DF6)
-I (..\LWIP\lwip_app\task_priority.h)(0x568A43AB)
+I (..\LWIP\lwip_app\task_priority.h)(0x568A6E5D)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/debug.h)(0x50CEF616)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/arch.h)(0x50CEF616)
 I (..\LWIP\arch/cc.h)(0x5447398C)
@@ -498,7 +499,7 @@ I (..\SYSTEM\usart\usart.h)(0x5447C0B7)
 I (D:\Keil_ARM\ARM\ARMCC\bin\..\include\stdio.h)(0x50F96150)
 I (..\HARDWARE\LCD\lcd.h)(0x56590D6A)
 I (D:\Keil_ARM\ARM\ARMCC\bin\..\include\stdlib.h)(0x50F96150)
-F (..\HARDWARE\DHT11\dht11.c)(0x568A4474)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\KEY -I..\HARDWARE\LCD -I..\HARDWARE\ETHERNET -I..\HARDWARE\TIMER -I..\HARDWARE\LED -I..\HARDWARE\SRAM -I..\FWLIB\STM32F4x7_ETH_Driver\inc -I..\MALLOC -I..\USMART -I..\LWIP -I..\LWIP\arch -I..\LWIP\lwip_header -I..\LWIP\app\TCP_Client -I..\LWIP\lwip_app\lwip_comm -I..\LWIP\lwip-1.4.1\src\include -I..\LWIP\lwip-1.4.1\src\include\ipv4 -I..\LWIP\lwip-1.4.1\src\include\lwip -I..\LWIP\lwip-1.4.1\src\include\netif -I..\UCOSII\CONFIG -I..\UCOSII\CORE -I..\UCOSII\PORT -I..\LWIP\lwip_app -I..\LWIP\lwip_app\tcp_client -I..\SOFTWARE -I..\HARDWARE\DHT11 -I D:\Keil_ARM\ARM\RV31\INC -I D:\Keil_ARM\ARM\CMSIS\Include -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -o "..\OBJ\dht11.o" --omf_browse "..\OBJ\dht11.crf" --depend "..\OBJ\dht11.d")
+F (..\HARDWARE\DHT11\dht11.c)(0x568A4F05)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\KEY -I..\HARDWARE\LCD -I..\HARDWARE\ETHERNET -I..\HARDWARE\TIMER -I..\HARDWARE\LED -I..\HARDWARE\SRAM -I..\FWLIB\STM32F4x7_ETH_Driver\inc -I..\MALLOC -I..\USMART -I..\LWIP -I..\LWIP\arch -I..\LWIP\lwip_header -I..\LWIP\app\TCP_Client -I..\LWIP\lwip_app\lwip_comm -I..\LWIP\lwip-1.4.1\src\include -I..\LWIP\lwip-1.4.1\src\include\ipv4 -I..\LWIP\lwip-1.4.1\src\include\lwip -I..\LWIP\lwip-1.4.1\src\include\netif -I..\UCOSII\CONFIG -I..\UCOSII\CORE -I..\UCOSII\PORT -I..\LWIP\lwip_app -I..\LWIP\lwip_app\tcp_client -I..\SOFTWARE -I..\HARDWARE\DHT11 -I D:\Keil_ARM\ARM\RV31\INC -I D:\Keil_ARM\ARM\CMSIS\Include -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -o "..\OBJ\dht11.o" --omf_browse "..\OBJ\dht11.crf" --depend "..\OBJ\dht11.d")
 I (..\HARDWARE\LED\led.h)(0x5688A778)
 I (..\SYSTEM\sys\sys.h)(0x5531CA40)
 I (..\USER\stm32f4xx.h)(0x5447C0B7)
@@ -1148,7 +1149,7 @@ I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dcmi.h)(0x53DBAFAD)
 I (..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_fsmc.h)(0x53DBAFAD)
 I (..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth.h)(0x53EE02B1)
 I (..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth_conf.h)(0x54436DF6)
-I (..\LWIP\lwip_app\task_priority.h)(0x568A43AB)
+I (..\LWIP\lwip_app\task_priority.h)(0x568A6E5D)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/debug.h)(0x50CEF616)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/arch.h)(0x50CEF616)
 I (..\LWIP\arch/cc.h)(0x5447398C)
@@ -1196,9 +1197,10 @@ I (..\MALLOC\malloc.h)(0x5404262B)
 I (..\SYSTEM\delay\delay.h)(0x54656F79)
 I (..\SYSTEM\usart\usart.h)(0x5447C0B7)
 I (..\LWIP\lwip_app\tcp_client\tcp_client.h)(0x568A470C)
-I (..\SOFTWARE\ihome_function.h)(0x56888CD3)
-I (..\USER\message_queue.h)(0x568A471F)
-F (..\LWIP\lwip_app\tcp_client\tcp_client.c)(0x568A47C9)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\KEY -I..\HARDWARE\LCD -I..\HARDWARE\ETHERNET -I..\HARDWARE\TIMER -I..\HARDWARE\LED -I..\HARDWARE\SRAM -I..\FWLIB\STM32F4x7_ETH_Driver\inc -I..\MALLOC -I..\USMART -I..\LWIP -I..\LWIP\arch -I..\LWIP\lwip_header -I..\LWIP\app\TCP_Client -I..\LWIP\lwip_app\lwip_comm -I..\LWIP\lwip-1.4.1\src\include -I..\LWIP\lwip-1.4.1\src\include\ipv4 -I..\LWIP\lwip-1.4.1\src\include\lwip -I..\LWIP\lwip-1.4.1\src\include\netif -I..\UCOSII\CONFIG -I..\UCOSII\CORE -I..\UCOSII\PORT -I..\LWIP\lwip_app -I..\LWIP\lwip_app\tcp_client -I..\SOFTWARE -I..\HARDWARE\DHT11 -I D:\Keil_ARM\ARM\RV31\INC -I D:\Keil_ARM\ARM\CMSIS\Include -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -o "..\OBJ\tcp_client.o" --omf_browse "..\OBJ\tcp_client.crf" --depend "..\OBJ\tcp_client.d")
+I (..\SOFTWARE\ihome_function.h)(0x568A5185)
+I (..\HARDWARE\DHT11\dht11.h)(0x565511D6)
+I (..\USER\message_queue.h)(0x568A534F)
+F (..\LWIP\lwip_app\tcp_client\tcp_client.c)(0x568A722C)(-c --cpu Cortex-M4.fp -g -O0 --apcs=interwork -I..\CORE -I..\SYSTEM\delay -I..\SYSTEM\sys -I..\SYSTEM\usart -I..\FWLIB\STM32F4xx_StdPeriph_Driver\inc -I..\USER -I..\HARDWARE\KEY -I..\HARDWARE\LCD -I..\HARDWARE\ETHERNET -I..\HARDWARE\TIMER -I..\HARDWARE\LED -I..\HARDWARE\SRAM -I..\FWLIB\STM32F4x7_ETH_Driver\inc -I..\MALLOC -I..\USMART -I..\LWIP -I..\LWIP\arch -I..\LWIP\lwip_header -I..\LWIP\app\TCP_Client -I..\LWIP\lwip_app\lwip_comm -I..\LWIP\lwip-1.4.1\src\include -I..\LWIP\lwip-1.4.1\src\include\ipv4 -I..\LWIP\lwip-1.4.1\src\include\lwip -I..\LWIP\lwip-1.4.1\src\include\netif -I..\UCOSII\CONFIG -I..\UCOSII\CORE -I..\UCOSII\PORT -I..\LWIP\lwip_app -I..\LWIP\lwip_app\tcp_client -I..\SOFTWARE -I..\HARDWARE\DHT11 -I D:\Keil_ARM\ARM\RV31\INC -I D:\Keil_ARM\ARM\CMSIS\Include -DSTM32F40_41xxx -DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -o "..\OBJ\tcp_client.o" --omf_browse "..\OBJ\tcp_client.crf" --depend "..\OBJ\tcp_client.d")
 I (..\LWIP\lwip_app\tcp_client\tcp_client.h)(0x568A470C)
 I (..\SYSTEM\sys\sys.h)(0x5531CA40)
 I (..\USER\stm32f4xx.h)(0x5447C0B7)
@@ -1266,10 +1268,11 @@ I (..\LWIP\lwip_app\lwip_comm\lwip_comm.h)(0x5683A559)
 I (..\HARDWARE\ETHERNET\lan8720.h)(0x54476271)
 I (..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth.h)(0x53EE02B1)
 I (..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth_conf.h)(0x54436DF6)
-I (..\LWIP\lwip_app\task_priority.h)(0x568A43AB)
-I (..\SOFTWARE\ihome_function.h)(0x56888CD3)
+I (..\LWIP\lwip_app\task_priority.h)(0x568A6E5D)
+I (..\SOFTWARE\ihome_function.h)(0x568A5185)
 I (..\MALLOC\malloc.h)(0x5404262B)
-I (..\USER\message_queue.h)(0x568A471F)
+I (..\HARDWARE\DHT11\dht11.h)(0x565511D6)
+I (..\USER\message_queue.h)(0x568A534F)
 I (..\SYSTEM\delay\delay.h)(0x54656F79)
 I (..\SYSTEM\usart\usart.h)(0x5447C0B7)
 I (..\HARDWARE\LED\led.h)(0x5688A778)
@@ -1402,7 +1405,7 @@ I (..\HARDWARE\ETHERNET\lan8720.h)(0x54476271)
 I (..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth.h)(0x53EE02B1)
 I (..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth_conf.h)(0x54436DF6)
 I (..\LWIP\lwip_app\lwip_comm\lwip_comm.h)(0x5683A559)
-I (..\LWIP\lwip_app\task_priority.h)(0x568A43AB)
+I (..\LWIP\lwip_app\task_priority.h)(0x568A6E5D)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/stats.h)(0x50CEFB5E)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/mem.h)(0x54042706)
 I (..\LWIP\lwip-1.4.1\src\include\lwip/memp.h)(0x50CEF616)

@@ -74,6 +74,7 @@
 ..\OBJ\tcp_client.o: ..\SOFTWARE\ihome_function.h
 ..\OBJ\tcp_client.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
 ..\OBJ\tcp_client.o: ..\MALLOC\malloc.h
+..\OBJ\tcp_client.o: ..\HARDWARE\DHT11\dht11.h
 ..\OBJ\tcp_client.o: ..\USER\message_queue.h
 ..\OBJ\tcp_client.o: ..\SYSTEM\delay\delay.h
 ..\OBJ\tcp_client.o: ..\SYSTEM\usart\usart.h
