@@ -80,3 +80,8 @@
 ..\OBJ\main.o: ..\HARDWARE\LCD\lcd.h
 ..\OBJ\main.o: ..\HARDWARE\SRAM\sram.h
 ..\OBJ\main.o: ..\MALLOC\malloc.h
+..\OBJ\main.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
+..\OBJ\main.o: ..\SOFTWARE\ihome_function.h
+..\OBJ\main.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
+..\OBJ\main.o: ..\USER\message_queue.h
+..\OBJ\main.o: ..\HARDWARE\DHT11\dht11.h

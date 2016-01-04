@@ -10,8 +10,9 @@
  *		4.u8 DHT11_Read_Bit(void);							//读出一个位
  *		5.u8 DHT11_Check(void);									//检测是否存在DHT11
  *		6.void DHT11_Rst(void);									//复位DHT11   
- */ 
-#include "pwm.h"
+ */
+ 
+//#include "pwm.h"
 #include "led.h"
 #include "usart.h"
 #include "dht11.h"
@@ -146,27 +147,4 @@ u8 DHT11_Init(void)
 	DHT11_Rst();
 	return DHT11_Check();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

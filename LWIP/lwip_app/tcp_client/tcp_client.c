@@ -18,13 +18,16 @@
  *    2.u8 KEY_Scan(u8 mode);
  */ 
 
+/*send消息队列*/
+void *send_q[SENDSIZE];
+OS_EVENT * msg_event;
+
 int pulse = 1;
  
 /*  tcp 连接任务堆栈         */
 OS_STK TCP_CONNECT_TASK_STK[TCP_CONNECT_STK_SIZE];	
 /*  处理从服务器接受到的信息 堆栈*/
 OS_STK HANDLE_MSG_TASK_STK[HANDLE_MSG_STK_SIZE];	
-
 
 struct tcp_pcb *tcp_client_pcb;  	//定义一个TCP服务器控制块
 struct ip_addr rmtipaddr;  	//远端ip地址
@@ -53,6 +56,7 @@ u8 tcp_client_flag = 0;
  */
 void tcp_connect_task(void *arg)
 {
+	u8 * send_buf;
 	printf("tcp connect task!\n");
 	tcp_client_sendbuf = mymalloc(SRAMEX, TCP_CLIENT_TX_BUFSIZE);
 	if(tcp_client_sendbuf==NULL)
@@ -81,17 +85,24 @@ void tcp_connect_task(void *arg)
 		isConnected = tcp_client_flag&1<<5;
 		while(isConnected && isAuthed)
 		{
-			printf("tcp sleep!\n");
-			sprintf(tcp_client_sendbuf, "%c%c%c",COMMAND_PULSE,COMMAND_SEPERATOR,COMMAND_END);
-			tcp_client_flag|=1<<7;//标记要发送数据
-			pulse = 0; //2秒内pulse被刷新，表示接收到心跳
-			OSTimeDlyHMSM(0,0,2,0);
-			if(pulse == 0)//断开连接
-			{
-				tcp_client_flag &= ~(1<<5);
-				isConnected = 0;
-				isAuthed = 0;
-			}
+// 			printf("tcp sleep!\n");
+// 			/*发送指令*/
+// 			send_buf = mymalloc(SRAMEX, 4); //4个就够了
+// 			sprintf((char *)send_buf, "%c%c%c",COMMAND_PULSE,COMMAND_SEPERATOR,COMMAND_END);
+// 			if(OSQPost(msg_event,send_buf) != OS_ERR_NONE)
+// 			{
+// 					printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+// 	    }
+// 			tcp_client_flag|=1<<7;//标记要发送数据
+// 			
+// 			pulse = 0; //5秒内pulse被刷新，表示接收到心跳
+			OSTimeDlyHMSM(0,0,5,0);
+// 			if(pulse == 0)//断开连接
+// 			{
+// 				tcp_client_flag &= ~(1<<5);
+// 				isConnected = 0;
+// 				isAuthed = 0;
+// 			}
 		}
 		/*--------重新连接---------*/
 		if(isConnected == 0)
@@ -113,8 +124,18 @@ void tcp_connect_task(void *arg)
 		/*--------认证信息---------*/
 		if((isConnected != 0)&&(isAuthed == 0))
 		{
-			sprintf(tcp_client_sendbuf, "%c%c975559549h%c%c%c975559549%c%c",COMMAND_MANAGE,COMMAND_SEPERATOR,COMMAND_SEPERATOR,MAN_LOGIN,COMMAND_SEPERATOR,COMMAND_SEPERATOR, COMMAND_END);
+			/*发送身份指令*/
+			send_buf = mymalloc(SRAMEX, 73); //32(account)+32(password)+7+1 认证信息最高上限
+			sprintf((char *)send_buf, "%c%c975559549h%c%c%c975559549%c%c",COMMAND_MANAGE,COMMAND_SEPERATOR,
+																			COMMAND_SEPERATOR,
+																			MAN_LOGIN,COMMAND_SEPERATOR,
+																			COMMAND_SEPERATOR, COMMAND_END);
+			if(OSQPost(msg_event,send_buf) != OS_ERR_NONE)
+			{
+					printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+	    }
 			tcp_client_flag|=1<<7;//标记要发送数据
+			
 			printf("is authing!\n");
 		}
 		OSTimeDlyHMSM(0,0,0,1000);
@@ -136,6 +157,7 @@ void handle_message_task(void *arg)
 	u8 res;
 	u8 i;
 	u8 j;
+	u8 *msg_buf;
 	char account[ACCOUNT_MAX + 1];
 	printf("handle message task!\n");
 	while(1)
@@ -243,112 +265,131 @@ void handle_message_task(void *arg)
 							continue;
 						}
 					}//end of RES_LOGIN
-				}
+				}//end of command_result
+				else if(type == COMMAND_CONTRL)
+				{
+					if(subtype == CTL_GET)
+					{
+						/*获得哪种设备的ID*/
+						if(tcp_client_recvbuf[i+1] == COMMAND_SEPERATOR)//判断是否合法
+						{
+							res = tcp_client_recvbuf[i];
+						}
+						else
+						{
+							/*当前指令无效,跳转到下一个指令*/
+							while((tcp_client_recvbuf[i] != '\0') && (tcp_client_recvbuf[i] != COMMAND_END)&&(i<TCP_CLIENT_RX_BUFSIZE))//msg[i]=END
+							{
+									i++;
+							}
+							i++;
+							continue;
+						}
+						i+=2;
+						/*获得设备ID*/
+						for(j = 0; (tcp_client_recvbuf[i]!='\0')&&(i<TCP_CLIENT_RX_BUFSIZE)&&(tcp_client_recvbuf[i]!=COMMAND_SEPERATOR)&&(j <= ACCOUNT_MAX); i++, j++)
+						{
+							/*暂时用account存返灯ID*/
+							account[j] = tcp_client_recvbuf[i];
+						}
+						i++;
+						account[j] = '\0';
+						printf("ID：%s ", account);
+						if(res == RES_TEMP)
+						{
+							/*--------------发送TEMP给DHT11 TSAK------------------------------*/
+							msg_buf = mymalloc(SRAMEX, 5);//外部内存分配空间
+							sprintf((char *)msg_buf, "TEMP");
+							if(OSQPost(dht11_event,msg_buf) != OS_ERR_NONE)
+							{
+								printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+							}
+							/*--------------发送温度传感器ID给DHT11任务-----------------------*/
+							msg_buf = mymalloc(SRAMEX, ACCOUNT_MAX + 1);//外部内存分配空间
+							sprintf((char *)msg_buf, (char *)account);
+							if(OSQPost(dht11_event,msg_buf) != OS_ERR_NONE)
+							{
+								printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+							}
+						}//end of temp
+						else if(res == RES_HUMI)
+						{
+							/*--------------发送HUMI给DHT11 TSAK------------------------------*/
+							msg_buf = mymalloc(SRAMEX, 5);//外部内存分配空间
+							sprintf((char *)msg_buf, "HUMI");
+							if(OSQPost(dht11_event,msg_buf) != OS_ERR_NONE)
+							{
+								printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+							}
+							/*---------------发送湿度传感器ID给DHT11任务------------------------*/
+							msg_buf = mymalloc(SRAMEX, ACCOUNT_MAX + 1);//外部内存分配空间
+							sprintf((char *)msg_buf, (char *)account);
+							if(OSQPost(dht11_event,msg_buf) != OS_ERR_NONE)
+							{
+								printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+							}
+						}
+						
+					}//end of ctl_get
+					else if(subtype == CTL_LAMP)
+					{
+						/*获得灯开还是关*/
+						if(tcp_client_recvbuf[i+1] == COMMAND_SEPERATOR)//判断是否合法
+						{
+							res = tcp_client_recvbuf[i];
+						}
+						else
+						{
+							/*当前指令无效,跳转到下一个指令*/
+							while((tcp_client_recvbuf[i] != '\0') && (tcp_client_recvbuf[i] != COMMAND_END)&&(i<TCP_CLIENT_RX_BUFSIZE))//msg[i]=END
+							{
+									i++;
+							}
+							i++;
+							continue;
+						}
+						i+=2;
+						/*获得灯ID*/
+						for(j = 0; (tcp_client_recvbuf[i]!='\0')&&(i<TCP_CLIENT_RX_BUFSIZE)&&(tcp_client_recvbuf[i]!=COMMAND_SEPERATOR)&&(j <= ACCOUNT_MAX); i++, j++)
+						{
+							/*暂时用account存返灯ID*/
+							account[j] = tcp_client_recvbuf[i];
+						}
+						i++;
+						account[j] = '\0';
+						printf("ID：%s ", account);
+						/*发送ON OFF给LED TSAK */
+						msg_buf = mymalloc(SRAMEX, 10);//外部内存分配空间
+						if(res == LAMP_ON)
+						{
+							printf("LAMP_ON\n");
+							sprintf((char *)msg_buf, "ON");
+						}
+						else if(res == LAMP_OFF)
+						{
+							printf("LAMP_OFF\n");
+							sprintf((char *)msg_buf, "OFF");
+						}
+						if(OSQPost(led_event,msg_buf) != OS_ERR_NONE)
+						{
+							printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+						}
+						/*发送灯ID给LED任务*/
+						msg_buf = mymalloc(SRAMEX, ACCOUNT_MAX + 1);//外部内存分配空间
+						sprintf((char *)msg_buf, (char *)account);
+						if(OSQPost(led_event,msg_buf) != OS_ERR_NONE)
+						{
+							printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+						}
+					}//end of ctl_lamp
+				}//end of command contrl
 			}
 			
 			LCD_ShowString(30,250,lcddev.width-30,lcddev.height-230,16,tcp_client_recvbuf);//显示接收到的数据		
 			tcp_client_flag&=~(1<<6);//标记数据已经被处理了.
 		}
-		
-	}
+	}// end of while(1)
 }
-
-//TCP Client 测试
-void tcp_client_test(void)
-{
- 	struct tcp_pcb *tcppcb;  	//定义一个TCP服务器控制块
-	struct ip_addr rmtipaddr;  	//远端ip地址
-	
-	u8 *tbuf;
- 	u8 key;
-	u8 res=0;		
-	u8 t=0; 
-	
-	//tcp_client_set_remoteip();//先选择IP
-	lwipdev.remoteip[0]=server_ip[0];
-	lwipdev.remoteip[1]=server_ip[1];
-	lwipdev.remoteip[2]=server_ip[2]; 
-	lwipdev.remoteip[3]=server_ip[3]; 
-	
-	LCD_Clear(WHITE);	//清屏
-	POINT_COLOR=RED; 	//红色字体
-	LCD_ShowString(30,30,200,16,16,"Explorer STM32F4");
-	LCD_ShowString(30,50,200,16,16,"TCP Client Test");
-	LCD_ShowString(30,70,200,16,16,"ATOM@ALIENTEK");  
-	LCD_ShowString(30,90,200,16,16,"KEY0:Send data");  
-	LCD_ShowString(30,110,200,16,16,"KEY_UP:Quit");  
-	LCD_ShowString(30,130,200,16,16,"When break,please quit!");  
-	tbuf=mymalloc(SRAMIN,200);	//申请内存
-	if(tbuf==NULL)return ;		//内存申请失败了,直接退出
-	sprintf((char*)tbuf,"Local IP:%d.%d.%d.%d",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);//服务器IP
-	LCD_ShowString(30,150,210,16,16,tbuf);  
-	sprintf((char*)tbuf,"Remote IP:%d.%d.%d.%d",lwipdev.remoteip[0],lwipdev.remoteip[1],lwipdev.remoteip[2],lwipdev.remoteip[3]);//远端IP
-	LCD_ShowString(30,170,210,16,16,tbuf);  
-	sprintf((char*)tbuf,"Remotewo Port:%d",TCP_CLIENT_PORT);//客户端端口号
-	LCD_ShowString(30,190,210,16,16,tbuf);
-	POINT_COLOR=BLUE;
-	LCD_ShowString(30,210,210,16,16,"STATUS:Disconnected"); 
-	tcppcb=tcp_new();	//创建一个新的pcb
-	if(tcppcb)			//创建成功
-	{
-		IP4_ADDR(&rmtipaddr,lwipdev.remoteip[0],lwipdev.remoteip[1],lwipdev.remoteip[2],lwipdev.remoteip[3]); 
-		tcp_connect(tcppcb,&rmtipaddr,TCP_CLIENT_PORT,tcp_client_connected);  //连接到目的地址的指定端口上,当连接成功后回调tcp_client_connected()函数
- 	}else res=1;
-	while(res==0)
-	{
-		key=KEY_Scan(0);
-		if(key==WKUP_PRES)break;
-		if(key==KEY0_PRES)//KEY0按下了,发送数据
-		{
-			tcp_client_flag|=1<<7;//标记要发送数据
-		}
-		if(tcp_client_flag&1<<6)//是否收到数据?
-		{
-			LCD_Fill(30,250,lcddev.width-1,lcddev.height-1,WHITE);//清上一次数据
-			LCD_ShowString(30,250,lcddev.width-30,lcddev.height-230,16,tcp_client_recvbuf);//显示接收到的数据		
-			tcp_client_flag&=~(1<<6);//标记数据已经被处理了.
-		}
-		if(tcp_client_flag&1<<5)//是否连接上?
-		{
-			LCD_ShowString(30,210,lcddev.width-30,lcddev.height-190,16,"STATUS:Connected   ");//提示消息		
-			POINT_COLOR=RED;
-			LCD_ShowString(30,230,lcddev.width-30,lcddev.height-190,16,"Receive Data:");//提示消息		
-			POINT_COLOR=BLUE;//蓝色字体
-		}else if((tcp_client_flag&1<<5)==0)
-		{
- 			LCD_ShowString(30,210,190,16,16,"STATUS:Disconnected");
-			LCD_Fill(30,230,lcddev.width-1,lcddev.height-1,WHITE);//清屏
-		} 
-		lwip_periodic_handle();
-		delay_ms(2);
-		t++;
-		if(t==200)
-		{
-			if((tcp_client_flag&1<<5)==0)//未连接上,则尝试重连
-			{ 
-				tcp_client_connection_close(tcppcb,0);//关闭连接
-				tcppcb=tcp_new();	//创建一个新的pcb
-				if(tcppcb)			//创建成功
-				{ 
-					tcp_connect(tcppcb,&rmtipaddr,TCP_CLIENT_PORT,tcp_client_connected);//连接到目的地址的指定端口上,当连接成功后回调tcp_client_connected()函数
-				}
-			}
-			t=0;
-			LED0=!LED0;
-		}		
-	}
-	tcp_client_connection_close(tcppcb,0);//关闭TCP Client连接
-	LCD_Clear(WHITE);
-	POINT_COLOR = RED;
-	LCD_ShowString(30,30,200,16,16,"Explorer STM32F4");
-	LCD_ShowString(30,50,200,16,16,"TCP Client Test"); 
-	LCD_ShowString(30,70,200,16,16,"ATOM@ALIENTEK");
-	
-	POINT_COLOR=BLUE;
-	LCD_ShowString(30,90,200,16,16,"Connect break！");  
-	LCD_ShowString(30,110,200,16,16,"KEY1:Connect");
-	myfree(SRAMIN,tbuf);
-} 
 
 //lwIP TCP连接建立后调用回调函数
 err_t tcp_client_connected(void *arg, struct tcp_pcb *tpcb, err_t err)
@@ -436,6 +477,9 @@ void tcp_client_error(void *arg,err_t err)
 //lwIP tcp_poll的回调函数
 err_t tcp_client_poll(void *arg, struct tcp_pcb *tpcb)
 {
+	u8 *msg;//接收到的消息
+	INT8U err;
+	
 	err_t ret_err;
 	struct tcp_client_struct *es; 
 	es=(struct tcp_client_struct*)arg;
@@ -443,9 +487,18 @@ err_t tcp_client_poll(void *arg, struct tcp_pcb *tpcb)
 	{
 		if(tcp_client_flag&(1<<7))	//判断是否有数据要发送 
 		{
-			es->p=pbuf_alloc(PBUF_TRANSPORT, strlen((char*)tcp_client_sendbuf),PBUF_POOL);	//申请内存 
-			pbuf_take(es->p,(char*)tcp_client_sendbuf,strlen((char*)tcp_client_sendbuf));	//将tcp_client_sentbuf[]中的数据拷贝到es->p_tx中
+			msg = (u8 *)OSQPend (msg_event,  //等待新消息
+                0,  //wait forever
+                &err);
+			if(err != OS_ERR_NONE)
+			{
+				printf("rev err!\n");
+			}
+			es->p=pbuf_alloc(PBUF_TRANSPORT, strlen((char*)msg),PBUF_POOL);	//申请内存 
+			pbuf_take(es->p,(char*)msg,strlen((char*)msg));	//将tcp_client_sentbuf[]中的数据拷贝到es->p_tx中
 			tcp_client_senddata(tpcb,es);//将tcp_client_sentbuf[]里面复制给pbuf的数据发送出去
+			
+			myfree(SRAMEX, msg); //清除空间
 			tcp_client_flag&=~(1<<7);	//清除数据发送标志
 			if(es->p)pbuf_free(es->p);	//释放内存
 		}else if(es->state==ES_TCPCLIENT_CLOSING)
@@ -500,6 +553,3 @@ void tcp_client_connection_close(struct tcp_pcb *tpcb, struct tcp_client_struct 
 	if(es)mem_free(es); 
 	tcp_client_flag&=~(1<<5);//标记连接断开了
 }
-
-
-

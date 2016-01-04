@@ -71,9 +71,12 @@
 ..\OBJ\tcp_client.o: ..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth_conf.h
 ..\OBJ\tcp_client.o: ..\LWIP\lwip_app\task_priority.h
 ..\OBJ\tcp_client.o: ..\LWIP\lwip_app\lwip_comm\lwip_comm.h
+..\OBJ\tcp_client.o: ..\SOFTWARE\ihome_function.h
+..\OBJ\tcp_client.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
+..\OBJ\tcp_client.o: ..\MALLOC\malloc.h
+..\OBJ\tcp_client.o: ..\USER\message_queue.h
 ..\OBJ\tcp_client.o: ..\SYSTEM\delay\delay.h
 ..\OBJ\tcp_client.o: ..\SYSTEM\usart\usart.h
 ..\OBJ\tcp_client.o: ..\HARDWARE\LED\led.h
 ..\OBJ\tcp_client.o: ..\HARDWARE\KEY\key.h
 ..\OBJ\tcp_client.o: ..\HARDWARE\LCD\lcd.h
-..\OBJ\tcp_client.o: ..\MALLOC\malloc.h

@@ -8,22 +8,9 @@
 #include "lwip/mem.h"
 #include "lwip_comm.h"
 #include "task_priority.h"
-//////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32F407开发板
-//TCP Client 测试代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//创建日期:2014/8/15
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
-//All rights reserved									  
-//*******************************************************************************
-//修改信息
-//无
-////////////////////////////////////////////////////////////////////////////////// 	   
-
+#include "ihome_function.h"   
+#include "malloc.h"
+#include "message_queue.h"
 
 #define ACCOUNT_MAX 32
 #define COMMAND_PULSE  '0'
@@ -57,6 +44,11 @@ extern u8 isAuthed;
 #define LWIP_SEND_DATA			0X80    //定义有数据发送
 #define	TCP_CLIENT_PORT			8080	//定义tcp client要连接的远端端口
 
+/*TCP Client接收数据缓冲区，发送缓冲区*/
+extern u8 tcp_client_recvbuf[TCP_CLIENT_RX_BUFSIZE];	
+extern u8 *tcp_client_sendbuf;
+extern u8 tcp_client_flag;
+
 //tcp服务器连接状态
 enum tcp_client_states
 {
@@ -73,7 +65,6 @@ struct tcp_client_struct
 };  
 
 void tcp_client_set_remoteip(void);
-void tcp_client_test(void);//TCP Client测试函数
 err_t tcp_client_connected(void *arg, struct tcp_pcb *tpcb, err_t err);
 err_t tcp_client_recv(void *arg,struct tcp_pcb *tpcb,struct pbuf *p,err_t err);
 void tcp_client_error(void *arg,err_t err);
