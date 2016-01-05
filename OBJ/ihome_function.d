@@ -1,4 +1,5 @@
 ..\OBJ\ihome_function.o: ..\SOFTWARE\ihome_function.c
+..\OBJ\ihome_function.o: ..\USER\idebug.h
 ..\OBJ\ihome_function.o: ..\LWIP\lwip_app\task_priority.h
 ..\OBJ\ihome_function.o: ..\SYSTEM\sys\sys.h
 ..\OBJ\ihome_function.o: ..\USER\stm32f4xx.h
@@ -77,3 +78,5 @@
 ..\OBJ\ihome_function.o: ..\USER\message_queue.h
 ..\OBJ\ihome_function.o: ..\HARDWARE\DHT11\dht11.h
 ..\OBJ\ihome_function.o: ..\HARDWARE\LED\led.h
+..\OBJ\ihome_function.o: ..\HARDWARE\LSENS\lsens.h
+..\OBJ\ihome_function.o: ..\HARDWARE\ADC3\adc3.h

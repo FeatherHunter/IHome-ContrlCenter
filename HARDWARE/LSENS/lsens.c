@@ -39,7 +39,7 @@ void Lsens_Init(void)
 u8 Lsens_Get_Val(void)
 {
 	u32 temp_val=0;
-	u8 t;
+	u32 t;
 	for(t=0;t<LSENS_READ_TIMES;t++)
 	{
 		temp_val+=Get_Adc3(ADC_Channel_5);	//读取ADC值,通道5
@@ -49,15 +49,4 @@ u8 Lsens_Get_Val(void)
 	if(temp_val>4000)temp_val=4000;
 	return (u8)(100-(temp_val/40));
 }
-
-
-
-
-
-
-
-
-
-
-
 

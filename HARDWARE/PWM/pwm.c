@@ -28,7 +28,7 @@ void TIM14_PWM_Init(u32 arr,u32 psc)
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM14,ENABLE);  	//TIM14时钟使能    
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE); 	//使能PORTF时钟	
 	
-	GPIO_PinAFConfig(GPIOF,GPIO_PinSource9,GPIO_AF_TIM14); //GPIOF9复用为定时器14 ========== LED0  ========
+	GPIO_PinAFConfig(GPIOF,GPIO_PinSource9,GPIO_AF_TIM14); //GPIOF9复用为定时器14
 	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;           //GPIOF9
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;        //复用功能
@@ -44,7 +44,7 @@ void TIM14_PWM_Init(u32 arr,u32 psc)
 	
 	TIM_TimeBaseInit(TIM14,&TIM_TimeBaseStructure);						//初始化定时器14
 	
-	//初始化TIM14 Channel1 PWM模式	 
+	//初始化TIM14 Channel 1 PWM模式	 
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1; 						//选择定时器模式:TIM脉冲宽度调制模式2
  	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; //比较输出使能
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low; 			//输出极性:TIM输出比较极性低
@@ -55,8 +55,7 @@ void TIM14_PWM_Init(u32 arr,u32 psc)
   TIM_ARRPreloadConfig(TIM14,ENABLE);														//ARPE使能 
 	
 	TIM_Cmd(TIM14, ENABLE);  																			//使能TIM14
- 
-										  
+ 	TIM_SetCompare1(TIM14, 500);			  
 }  
 
 

@@ -7,5 +7,6 @@
 #include "string.h"
 #include "dht11.h"
 extern OS_EVENT * led_event;
+extern int ihome_start_flag;
 
 #endif

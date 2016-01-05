@@ -147,4 +147,3 @@ u8 DHT11_Init(void)
 	DHT11_Rst();
 	return DHT11_Check();
 }
-

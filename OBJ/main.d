@@ -85,3 +85,6 @@
 ..\OBJ\main.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
 ..\OBJ\main.o: ..\HARDWARE\DHT11\dht11.h
 ..\OBJ\main.o: ..\USER\message_queue.h
+..\OBJ\main.o: ..\HARDWARE\PWM\pwm.h
+..\OBJ\main.o: ..\HARDWARE\LSENS\lsens.h
+..\OBJ\main.o: ..\HARDWARE\ADC3\adc3.h

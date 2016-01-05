@@ -17,6 +17,8 @@
 #include "tcp_client.h"
 #include "dht11.h"
 #include "message_queue.h"
+#include "pwm.h"
+#include "lsens.h"
 /*LED任务*/
 OS_STK	LED_TASK_STK[LED_STK_SIZE];
 void led_task(void *pdata);
@@ -35,9 +37,6 @@ OS_EVENT * dht11_event;
 OS_STK START_TASK_STK[START_STK_SIZE];
 void start_task(void *pdata); 
 
-#define SIZE 5
-void *ServersMSG[SIZE];
-
 int main(void)
 {
 	delay_init(168);       	//延时初始化
@@ -48,6 +47,9 @@ int main(void)
 	KEY_Init();  			//按键初始化
 	LCD_Init();  			//LCD初始化
 	FSMC_SRAM_Init();		//SRAM初始化
+	
+	TIM14_PWM_Init(500-1,84-1);	//PF9 PWM,84M/84=1Mhz计数频率,重装载值500,所以PWM频率为 1M/500=2Khz. 
+	Lsens_Init();               //光敏电阻初始化
 	
 	while(DHT11_Init())//温湿度传感器
 	{

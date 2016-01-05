@@ -1,4 +1,7 @@
 #include "tcp_client.h" 
+#include "task_priority.h"
+#include "ihome_function.h"
+#include "idebug.h"
 #include "delay.h"
 #include "usart.h"
 #include "led.h"
@@ -7,7 +10,6 @@
 #include "malloc.h"
 #include "stdio.h"
 #include "string.h" 
-#include "task_priority.h"
 /**
  * @copyright 王辰浩(2015~2025) QQ：975559549
  * @Author Feather @version 1.0 @date 2015.12.30
@@ -57,11 +59,11 @@ u8 tcp_client_flag = 0;
 void tcp_connect_task(void *arg)
 {
 	u8 * send_buf;
-	printf("tcp connect task!\n");
+	DEBUG("tcp connect task!\n");
 	tcp_client_sendbuf = mymalloc(SRAMEX, TCP_CLIENT_TX_BUFSIZE);
 	if(tcp_client_sendbuf==NULL)
 	{
-		printf("tcp_client_sendbuf malloc error!,%s %d\n", __FILE__, __LINE__);
+		DEBUG("tcp_client_sendbuf malloc error!,%s %d\n", __FILE__, __LINE__);
 	}
 	/*设置服务器ip地址*/
 	lwipdev.remoteip[0]=server_ip[0];
@@ -77,7 +79,7 @@ void tcp_connect_task(void *arg)
   }
 	else
 	{
-		 printf("tcp_client_pcb null,%s %d\n", __FILE__, __LINE__);
+		 DEBUG("tcp_client_pcb null,%s %d\n", __FILE__, __LINE__);
 	}
 	while(1)
 	{
@@ -115,11 +117,11 @@ void tcp_connect_task(void *arg)
 			}
 			else
 			{
-				printf("tcp_client_pcb = null\n");
+				DEBUG("tcp_client_pcb = null\n");
 			}
 			isConnected = tcp_client_flag&1<<5;
 			isAuthed = 0;
-			printf("is connecting!\n");
+			DEBUG("is connecting!\n");
 		}
 		/*--------认证信息---------*/
 		if((isConnected != 0)&&(isAuthed == 0))
@@ -132,14 +134,14 @@ void tcp_connect_task(void *arg)
 																			COMMAND_SEPERATOR, COMMAND_END);
 			if(OSQPost(msg_event,send_buf) != OS_ERR_NONE)
 			{
-					printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 	    }
 			tcp_client_flag|=1<<7;//标记要发送数据
 			
-			printf("is authing!\n");
+			DEBUG("is authing!\n");
 		}
 		OSTimeDlyHMSM(0,0,0,1000);
-		printf("tcp connect task!\n");
+		DEBUG("tcp connect task!\n");
 	}
 
 }
@@ -158,8 +160,9 @@ void handle_message_task(void *arg)
 	u8 i;
 	u8 j;
 	u8 *msg_buf;
+	u8 *send_buf;
 	char account[ACCOUNT_MAX + 1];
-	printf("handle message task!\n");
+	DEBUG("handle message task!\n");
 	while(1)
 	{
 		while(isConnected == 0)
@@ -168,7 +171,7 @@ void handle_message_task(void *arg)
 		}
 		if(tcp_client_flag&(1<<6))//是否收到数据?
 		{
-			printf("handle message task!\n");
+			DEBUG("handle message task!\n");
 			LCD_ShowString(30,250,lcddev.width-30,lcddev.height-230,16,tcp_client_recvbuf);//显示接收到的数据
 			i = 0;
 			/*解析接收到的信息(可能包含多个指令)*/
@@ -268,7 +271,45 @@ void handle_message_task(void *arg)
 				}//end of command_result
 				else if(type == COMMAND_CONTRL)
 				{
-					if(subtype == CTL_GET)
+					if(subtype == CTL_IHome)
+					{
+						/*获得开启还是关闭IHome Mode*/
+						if(tcp_client_recvbuf[i+1] == COMMAND_SEPERATOR)//判断是否合法
+						{
+							res = tcp_client_recvbuf[i];
+						}
+						else
+						{
+							/*当前指令无效,跳转到下一个指令*/
+							while((tcp_client_recvbuf[i] != '\0') && (tcp_client_recvbuf[i] != COMMAND_END)&&(i<TCP_CLIENT_RX_BUFSIZE))//msg[i]=END
+							{
+									i++;
+							}
+							i++;
+							continue;
+						}
+						i+=2;
+						if(res == IHome_START)//start ihome
+						{
+							ihome_start_flag = IHome_START;
+						}
+						else if(res == IHome_STOP)//stop ihome
+						{
+							ihome_start_flag = IHome_STOP;
+						}
+						/*-------------返回IHome mode状态信息给用户-----------*/
+						send_buf = mymalloc(SRAMEX, 74); //32(account)+32(ID)+9+1 状态指令最高上限
+						sprintf((char *)send_buf, "%c%c975559549h%c%c%c%c%c%c",
+																		COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,
+																		RES_IHome,COMMAND_SEPERATOR,
+																		ihome_start_flag,COMMAND_SEPERATOR,COMMAND_END);
+						if(OSQPost(msg_event,send_buf) != OS_ERR_NONE)
+						{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+						}
+						tcp_client_flag|=1<<7;//标记要发送数据
+					}//end of ctl_ihome
+					else if(subtype == CTL_GET)
 					{
 						/*获得哪种设备的ID*/
 						if(tcp_client_recvbuf[i+1] == COMMAND_SEPERATOR)//判断是否合法
@@ -302,14 +343,14 @@ void handle_message_task(void *arg)
 							sprintf((char *)msg_buf, "TEMP");
 							if(OSQPost(dht11_event,msg_buf) != OS_ERR_NONE)
 							{
-								printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+								DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 							}
 							/*--------------发送温度传感器ID给DHT11任务-----------------------*/
 							msg_buf = mymalloc(SRAMEX, ACCOUNT_MAX + 1);//外部内存分配空间
 							sprintf((char *)msg_buf, (char *)account);
 							if(OSQPost(dht11_event,msg_buf) != OS_ERR_NONE)
 							{
-								printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+								DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 							}
 						}//end of temp
 						else if(res == RES_HUMI)
@@ -319,14 +360,14 @@ void handle_message_task(void *arg)
 							sprintf((char *)msg_buf, "HUMI");
 							if(OSQPost(dht11_event,msg_buf) != OS_ERR_NONE)
 							{
-								printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+								DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 							}
 							/*---------------发送湿度传感器ID给DHT11任务------------------------*/
 							msg_buf = mymalloc(SRAMEX, ACCOUNT_MAX + 1);//外部内存分配空间
 							sprintf((char *)msg_buf, (char *)account);
 							if(OSQPost(dht11_event,msg_buf) != OS_ERR_NONE)
 							{
-								printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+								DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 							}
 						}
 						
@@ -357,31 +398,32 @@ void handle_message_task(void *arg)
 						}
 						i++;
 						account[j] = '\0';
-						printf("ID：%s ", account);
+						DEBUG("ID：%s \n", account);
 						/*发送ON OFF给LED TSAK */
 						msg_buf = mymalloc(SRAMEX, 10);//外部内存分配空间
 						if(res == LAMP_ON)
 						{
-							printf("LAMP_ON\n");
+							DEBUG("LAMP_ON\n");
 							sprintf((char *)msg_buf, "ON");
 						}
 						else if(res == LAMP_OFF)
 						{
-							printf("LAMP_OFF\n");
+							DEBUG("LAMP_OFF\n");
 							sprintf((char *)msg_buf, "OFF");
 						}
 						if(OSQPost(led_event,msg_buf) != OS_ERR_NONE)
 						{
-							printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 						}
 						/*发送灯ID给LED任务*/
 						msg_buf = mymalloc(SRAMEX, ACCOUNT_MAX + 1);//外部内存分配空间
 						sprintf((char *)msg_buf, (char *)account);
 						if(OSQPost(led_event,msg_buf) != OS_ERR_NONE)
 						{
-							printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 						}
 					}//end of ctl_lamp
+				
 				}//end of command contrl
 			}
 			
@@ -389,7 +431,8 @@ void handle_message_task(void *arg)
 			
 			tcp_client_flag&=~(1<<6);//标记数据已经被处理了.
 		}
-	}// end of while(1)
+	  //lwip_periodic_handle();//LWIP轮询任务
+  }// end of while(1)
 }
 
 //lwIP TCP连接建立后调用回调函数
@@ -493,7 +536,7 @@ err_t tcp_client_poll(void *arg, struct tcp_pcb *tpcb)
                 &err);
 			if(err != OS_ERR_NONE)
 			{
-				printf("rev err!\n");
+				DEBUG("rev err! %s %d\n", __FILE__, __LINE__);
 			}
 			es->p=pbuf_alloc(PBUF_TRANSPORT, strlen((char*)msg),PBUF_POOL);	//申请内存 
 			pbuf_take(es->p,(char*)msg,strlen((char*)msg));	//将tcp_client_sentbuf[]中的数据拷贝到es->p_tx中

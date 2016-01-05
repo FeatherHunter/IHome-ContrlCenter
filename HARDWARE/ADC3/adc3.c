@@ -11,7 +11,6 @@
  *		3.u16 Get_Adc3_Average(u8 ch,u8 times);//得到某个通道给定次数采样的平均值  
  */ 	
 
-
 /**
  * @Function void  Adc3_Init(void)
  * @description 初始化ADC	3
@@ -66,11 +65,4 @@ u16 Get_Adc3(u8 ch)
 
 	return ADC_GetConversionValue(ADC3);	//返回最近一次ADC3规则组的转换结果
 }
- 
-
-
-
-
-
-
 

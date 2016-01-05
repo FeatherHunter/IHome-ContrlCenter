@@ -63,23 +63,3 @@ u8 KEY_Scan(u8 mode)
 	}else if(KEY0==1&&KEY1==1&&KEY2==1&&WK_UP==0)key_up=1; 	    
  	return 0;						// 无按键按下
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
