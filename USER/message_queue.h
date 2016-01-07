@@ -14,8 +14,13 @@ extern OS_EVENT * dht11_event;
 
 /*send消息队列*/
 #define SENDSIZE 10
-extern void *send_q[SENDSIZE];
-extern OS_EVENT * msg_event;
+extern void *client_send_q[SENDSIZE];
+extern OS_EVENT * client_send_event;
+
+/*tcp client handle msg消息队列*/
+#define HANDLESIZE 10
+extern void *client_handle_q[HANDLESIZE];
+extern OS_EVENT * client_handle_event;
 
 #endif
 

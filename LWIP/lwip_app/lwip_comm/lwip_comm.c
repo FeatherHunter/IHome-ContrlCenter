@@ -23,9 +23,12 @@
 #include "delay.h"
 #include "usart.h"  
 #include <stdio.h>
-#include "ucos_ii.h" 
-#include "tcp_client.h"   
-   
+#include "ucos_ii.h"  
+#include "tcp_client_netconn.h"
+#include "idebug.h"
+
+u8 server_ip[4] = {139, 129, 19, 115};
+
 __lwip_dev lwipdev;						//lwip控制结构体 
 struct netif lwip_netif;				//定义一个全局的网络接口
 
@@ -94,10 +97,10 @@ void lwip_comm_default_ip_set(__lwip_dev *lwipx)
 	u32 sn0;
 	sn0=*(vu32*)(0x1FFF7A10);//获取STM32的唯一ID的前24位作为MAC地址后三字节
 	//默认远端IP为:192.168.1.100
-	lwipx->remoteip[0]=192;	
-	lwipx->remoteip[1]=168;
-	lwipx->remoteip[2]=1;
-	lwipx->remoteip[3]=11;
+	lwipx->remoteip[0]=server_ip[0];	
+	lwipx->remoteip[1]=server_ip[1];
+	lwipx->remoteip[2]=server_ip[2];
+	lwipx->remoteip[3]=server_ip[3];
 	//MAC地址设置(高三字节固定为:2.0.0,低三字节用STM32唯一ID)
 	lwipx->mac[0]=2;//高三字节(IEEE称之为组织唯一ID,OUI)地址固定为:2.0.0
 	lwipx->mac[1]=0;
@@ -180,6 +183,8 @@ void lwip_comm_dhcp_delete(void)
 	dhcp_stop(&lwip_netif); 		//关闭DHCP
 	OSTaskDel(LWIP_DHCP_TASK_PRIO);	//删除DHCP任务
 }
+
+#if 0
 //DHCP处理任务
 void lwip_dhcp_task(void *pdata)
 {
@@ -242,6 +247,68 @@ void lwip_dhcp_task(void *pdata)
 		OS_EXIT_CRITICAL(); 
 		tcp_connect_task_flag = 0; 
 	}		
+	//lwip_comm_dhcp_delete();//删除DHCP任务 
+}
+#endif
+
+//DHCP处理任务
+void lwip_dhcp_task(void *pdata)
+{
+	u32 ip=0,netmask=0,gw=0;
+	dhcp_start(&lwip_netif);//开启DHCP 
+	lwipdev.dhcpstatus=0;	//正在DHCP
+	printf("正在查找DHCP服务器,请稍等...........\r\n");   
+	while(1)
+	{ 
+		printf("正在获取地址...\r\n");
+		ip=lwip_netif.ip_addr.addr;		//读取新IP地址
+		netmask=lwip_netif.netmask.addr;//读取子网掩码
+		gw=lwip_netif.gw.addr;			//读取默认网关 
+		if(ip!=0)   					//当正确读取到IP地址的时候
+		{
+			lwipdev.dhcpstatus=2;	//DHCP成功
+ 			printf("网卡en的MAC地址为:................%d.%d.%d.%d.%d.%d\r\n",lwipdev.mac[0],lwipdev.mac[1],lwipdev.mac[2],lwipdev.mac[3],lwipdev.mac[4],lwipdev.mac[5]);
+			//解析出通过DHCP获取到的IP地址
+			lwipdev.ip[3]=(uint8_t)(ip>>24); 
+			lwipdev.ip[2]=(uint8_t)(ip>>16);
+			lwipdev.ip[1]=(uint8_t)(ip>>8);
+			lwipdev.ip[0]=(uint8_t)(ip);
+			printf("通过DHCP获取到IP地址..............%d.%d.%d.%d\r\n",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+			//解析通过DHCP获取到的子网掩码地址
+			lwipdev.netmask[3]=(uint8_t)(netmask>>24);
+			lwipdev.netmask[2]=(uint8_t)(netmask>>16);
+			lwipdev.netmask[1]=(uint8_t)(netmask>>8);
+			lwipdev.netmask[0]=(uint8_t)(netmask);
+			printf("通过DHCP获取到子网掩码............%d.%d.%d.%d\r\n",lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
+			//解析出通过DHCP获取到的默认网关
+			lwipdev.gateway[3]=(uint8_t)(gw>>24);
+			lwipdev.gateway[2]=(uint8_t)(gw>>16);
+			lwipdev.gateway[1]=(uint8_t)(gw>>8);
+			lwipdev.gateway[0]=(uint8_t)(gw);
+			printf("通过DHCP获取到的默认网关..........%d.%d.%d.%d\r\n",lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
+			break;
+		}else if(lwip_netif.dhcp->tries>LWIP_MAX_DHCP_TRIES) //通过DHCP服务获取IP地址失败,且超过最大尝试次数
+		{  
+			lwipdev.dhcpstatus=0XFF;//DHCP失败.
+			//使用静态IP地址
+			IP4_ADDR(&(lwip_netif.ip_addr),lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+			IP4_ADDR(&(lwip_netif.netmask),lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
+			IP4_ADDR(&(lwip_netif.gw),lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
+			printf("DHCP服务超时,使用静态IP地址!\r\n");
+			printf("网卡en的MAC地址为:................%d.%d.%d.%d.%d.%d\r\n",lwipdev.mac[0],lwipdev.mac[1],lwipdev.mac[2],lwipdev.mac[3],lwipdev.mac[4],lwipdev.mac[5]);
+			printf("静态IP地址........................%d.%d.%d.%d\r\n",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+			printf("子网掩码..........................%d.%d.%d.%d\r\n",lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
+			printf("默认网关..........................%d.%d.%d.%d\r\n",lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
+			break;
+		}  
+		delay_ms(250); //延时250ms
+	}
+	while(tcp_client_init()) 									//初始化tcp_client(创建tcp_client线程)
+	{
+		DEBUG("TCP Client failed!!"); //tcp客户端创建失败
+		delay_ms(1000);
+	}
+	DEBUG("TCP Client Success!"); 	//tcp客户端创建成
 	//lwip_comm_dhcp_delete();//删除DHCP任务 
 }
 

@@ -89,8 +89,5 @@
 ..\OBJ\lwip_comm.o: ..\MALLOC\malloc.h
 ..\OBJ\lwip_comm.o: ..\SYSTEM\delay\delay.h
 ..\OBJ\lwip_comm.o: ..\SYSTEM\usart\usart.h
-..\OBJ\lwip_comm.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
-..\OBJ\lwip_comm.o: ..\SOFTWARE\ihome_function.h
-..\OBJ\lwip_comm.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
-..\OBJ\lwip_comm.o: ..\HARDWARE\DHT11\dht11.h
-..\OBJ\lwip_comm.o: ..\USER\message_queue.h
+..\OBJ\lwip_comm.o: ..\LWIP\lwip_app\tcp_client_netconn\tcp_client_netconn.h
+..\OBJ\lwip_comm.o: ..\USER\idebug.h

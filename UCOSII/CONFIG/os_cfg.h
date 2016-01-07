@@ -42,7 +42,7 @@
 #define OS_MAX_EVENTS            10u   /*系统最大事件数 Max. number of event control blocks in your application      */
 #define OS_MAX_FLAGS              5u   /*系统最大的信号量集数Max. number of Event Flag Groups    in your application      */
 #define OS_MAX_MEM_PART           5u   /*内存块数目 Max. number of memory partitions                             */
-#define OS_MAX_QS                 5u   /* Max. number of queue control blocks in your application      */
+#define OS_MAX_QS                10u   /* Max. number of queue control blocks in your application      */
 #define OS_MAX_TASKS             10u   /* Max. number of tasks in your application, MUST be >= 2       */
 
 #define OS_SCHED_LOCK_EN          1u   /* Include code for OSSchedLock() and OSSchedUnlock()           */

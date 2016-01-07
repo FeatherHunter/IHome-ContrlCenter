@@ -1,6 +1,7 @@
 #include "sys.h"
 #include "delay.h"
 #include "usart.h"
+#include "idebug.h"
 #include "led.h"
 #include "key.h"
 #include "lwip_comm.h"
@@ -14,25 +15,11 @@
 #include "includes.h"
 #include "lwipopts.h"
 #include "task_priority.h"
-#include "tcp_client.h"
 #include "dht11.h"
 #include "message_queue.h"
 #include "pwm.h"
 #include "lsens.h"
-/*LED任务*/
-OS_STK	LED_TASK_STK[LED_STK_SIZE];
-void led_task(void *pdata);
-/*led消息队列*/
-void *led_q[MSGSIZE];
-OS_EVENT * led_event;
-
-/*dht11 任务*/
-OS_STK	DHT11_TASK_STK[DHT11_STK_SIZE];
-void dht11_task(void *pdata);
-/*dht11 消息队列*/
-void *dht11_q[DHT11SIZE];
-OS_EVENT * dht11_event;
-
+#include "tcp_client_netconn.h"
 /*start任务*/
 OS_STK START_TASK_STK[START_STK_SIZE];
 void start_task(void *pdata); 
@@ -89,17 +76,19 @@ void start_task(void *pdata)
 	
 	OSStatInit();  			//初始化统计任务
 	OS_ENTER_CRITICAL();  	//关中断
+	
+	dht11_event           = OSQCreate(&dht11_q[0]        , DHT11SIZE);
+	led_event             = OSQCreate(&led_q[0]          , MSGSIZE);
+	client_send_event     = OSQCreate(&client_send_q[0]  , SENDSIZE);   //创建处理消息队列
+  client_handle_event   = OSQCreate(&client_handle_q[0], HANDLESIZE); //创建发送消息队列
+	
 #if LWIP_DHCP
-	//lwip_dhcp_configure();
 	lwip_comm_dhcp_creat(); //创建DHCP任务
 #endif
-	led_event = OSQCreate(&led_q[0], MSGSIZE); //创建led消息队列
-	msg_event = OSQCreate(&send_q[0], SENDSIZE); //创建发送消息队列
-	dht11_event = OSQCreate(&dht11_q[0], DHT11SIZE); //创建dht11消息队列
 	
-	OSTaskCreate(handle_message_task,(void*)0,(OS_STK*)&HANDLE_MSG_TASK_STK[HANDLE_MSG_STK_SIZE-1],HANDLE_MSG_TASK_PRIO); //显示任务
 	OSTaskCreate(led_task,(void*)0,(OS_STK*)&LED_TASK_STK[LED_STK_SIZE-1],LED_TASK_PRIO);//创建LED任务
-	OSTaskCreate(dht11_task,(void*)0,(OS_STK*)&DHT11_TASK_STK[DHT11_STK_SIZE-1],DHT11_TASK_PRIO);//创建DHT11任务
+ 	OSTaskCreate(dht11_task,(void*)0,(OS_STK*)&DHT11_TASK_STK[DHT11_STK_SIZE-1],DHT11_TASK_PRIO);//创建DHT11任务
+	
 	OSTaskSuspend(OS_PRIO_SELF); //挂起start_task任务
 	OS_EXIT_CRITICAL();  		//开中断
 }

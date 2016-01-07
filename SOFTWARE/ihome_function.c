@@ -1,6 +1,8 @@
 #include "idebug.h"
 #include "task_priority.h"
 #include "ihome_function.h"
+#include "instructions.h"
+#include "message_queue.h"
 #include "led.h"
 #include "lsens.h"
 
@@ -20,6 +22,19 @@
 int ihome_start_flag = IHome_STOP;
  
  
+/*LED任务堆栈*/
+OS_STK	LED_TASK_STK[LED_STK_SIZE];
+/*DHT11任务堆栈*/
+OS_STK	DHT11_TASK_STK[DHT11_STK_SIZE];
+
+/*led消息队列*/
+void *led_q[MSGSIZE];
+OS_EVENT * led_event;
+
+/*dht11 消息队列*/
+void *dht11_q[DHT11SIZE];
+OS_EVENT * dht11_event;
+ 
 /**
  * @Function void led_task(void *pdata);
  * @description 处理灯的任务。
@@ -36,7 +51,7 @@ void led_task(void *pdata)
 	
 	while(1)
 	{
-		DEBUG("led task!\n");
+		DEBUG("led task!\r\n");
 		if(ihome_start_flag == IHome_START)//开启了IHome模式
 		{
 			lsens = (Lsens_Get_Val()+10)*5;
@@ -54,7 +69,7 @@ void led_task(void *pdata)
                 &err);
 		if(err != OS_ERR_NONE)
 		{
-			DEBUG("LED TASK OSQPend error %s %d\n", __FILE__, __LINE__);
+			//DEBUG("LED TASK OSQPend error %s %d\n", __FILE__, __LINE__);
 			continue; //没有接收到指令
 		}
 		if(strcmp(msg, "ON") == 0)
@@ -73,11 +88,10 @@ void led_task(void *pdata)
 																		RES_LAMP,COMMAND_SEPERATOR,
 																		LAMP_ON, COMMAND_SEPERATOR, 
 																		"0", COMMAND_SEPERATOR,COMMAND_END);
-				if(OSQPost(msg_event,send_buf) != OS_ERR_NONE)
+				if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)
 				{
 					DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 				}
- 				tcp_client_flag|=1<<7;//标记要发送数据
  			}
 		}
  		else if(strcmp(msg, "OFF") == 0)
@@ -96,11 +110,10 @@ void led_task(void *pdata)
  																		RES_LAMP,COMMAND_SEPERATOR,
  																		LAMP_OFF, COMMAND_SEPERATOR, 
  																		"0", COMMAND_SEPERATOR,COMMAND_END);
-				if(OSQPost(msg_event,send_buf) != OS_ERR_NONE)
+				if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)
 				{
 					printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 				}
- 				tcp_client_flag|=1<<7;//标记要发送数据
  			}
  		}
 		myfree(SRAMEX, msg);
@@ -122,16 +135,14 @@ void dht11_task(void *pdata)
 	u8 temp, humi;
 	u8 * send_buf;
 	INT8U err;
-	
 	while(1)
 	{
-		DEBUG("dht11 task!\n");
 		msg1 = (char *)OSQPend (dht11_event,
                 0,  //wait forever
                 &err);
 		if(err != OS_ERR_NONE)
 		{
-			DEBUG("msg1 OSQPend error %s %d\n", __FILE__, __LINE__);
+			//DEBUG("msg1 OSQPend error :%d \r\n", err);
 			continue; //接收错误
 		}
  		msg2 = (char *)OSQPend (dht11_event,
@@ -139,7 +150,7 @@ void dht11_task(void *pdata)
                  &err);
 		if(err != OS_ERR_NONE)
 		{
-			DEBUG("msg2 OSQPend error %s %d\n", __FILE__, __LINE__);
+			//DEBUG("msg2 OSQPend error %s %d\n", __FILE__, __LINE__);
 			continue; //接收错误
 		}
 		DEBUG("msg1:%s\n", msg1);
@@ -162,11 +173,10 @@ void dht11_task(void *pdata)
  																		 RES_TEMP,COMMAND_SEPERATOR,
  																		  msg2, COMMAND_SEPERATOR,  //设备号
  																		    temp, COMMAND_SEPERATOR,COMMAND_END);
-				if(OSQPost(msg_event,send_buf) != OS_ERR_NONE)
+				if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)
 				{
 					DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 				}
- 				tcp_client_flag|=1<<7;//标记要发送数据
  			}
 
 		}//end of (strcmp(msg, "TEMP") == 0)
@@ -188,12 +198,10 @@ void dht11_task(void *pdata)
  																	RES_HUMI,COMMAND_SEPERATOR,
  			  													msg2, COMMAND_SEPERATOR,  //设备号
  																	humi, COMMAND_SEPERATOR,COMMAND_END);
-				if(OSQPost(msg_event,send_buf) != OS_ERR_NONE)
+				if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)
 				{
 					DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 				}
-				
- 				tcp_client_flag|=1<<7;//标记要发送数据
  			}
 		}//end of strcmp(msg, "HUMI") == 0
 		

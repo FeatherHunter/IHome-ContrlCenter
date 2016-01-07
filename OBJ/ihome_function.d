@@ -72,11 +72,10 @@
 ..\OBJ\ihome_function.o: ..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth_conf.h
 ..\OBJ\ihome_function.o: ..\LWIP\lwip_app\task_priority.h
 ..\OBJ\ihome_function.o: ..\SOFTWARE\ihome_function.h
-..\OBJ\ihome_function.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
-..\OBJ\ihome_function.o: ..\SOFTWARE\ihome_function.h
 ..\OBJ\ihome_function.o: ..\MALLOC\malloc.h
-..\OBJ\ihome_function.o: ..\USER\message_queue.h
 ..\OBJ\ihome_function.o: ..\HARDWARE\DHT11\dht11.h
+..\OBJ\ihome_function.o: ..\USER\instructions.h
+..\OBJ\ihome_function.o: ..\USER\message_queue.h
 ..\OBJ\ihome_function.o: ..\HARDWARE\LED\led.h
 ..\OBJ\ihome_function.o: ..\HARDWARE\LSENS\lsens.h
 ..\OBJ\ihome_function.o: ..\HARDWARE\ADC3\adc3.h

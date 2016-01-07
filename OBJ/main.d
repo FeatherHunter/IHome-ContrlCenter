@@ -38,6 +38,7 @@
 ..\OBJ\main.o: ..\SYSTEM\delay\delay.h
 ..\OBJ\main.o: ..\SYSTEM\usart\usart.h
 ..\OBJ\main.o: D:\Keil_ARM\ARM\ARMCC\bin\..\include\stdio.h
+..\OBJ\main.o: idebug.h
 ..\OBJ\main.o: ..\HARDWARE\LED\led.h
 ..\OBJ\main.o: ..\HARDWARE\KEY\key.h
 ..\OBJ\main.o: ..\LWIP\lwip_app\lwip_comm\lwip_comm.h
@@ -80,11 +81,9 @@
 ..\OBJ\main.o: ..\HARDWARE\LCD\lcd.h
 ..\OBJ\main.o: ..\HARDWARE\SRAM\sram.h
 ..\OBJ\main.o: ..\MALLOC\malloc.h
-..\OBJ\main.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
-..\OBJ\main.o: ..\SOFTWARE\ihome_function.h
-..\OBJ\main.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
 ..\OBJ\main.o: ..\HARDWARE\DHT11\dht11.h
-..\OBJ\main.o: ..\USER\message_queue.h
+..\OBJ\main.o: message_queue.h
 ..\OBJ\main.o: ..\HARDWARE\PWM\pwm.h
 ..\OBJ\main.o: ..\HARDWARE\LSENS\lsens.h
 ..\OBJ\main.o: ..\HARDWARE\ADC3\adc3.h
+..\OBJ\main.o: ..\LWIP\lwip_app\tcp_client_netconn\tcp_client_netconn.h

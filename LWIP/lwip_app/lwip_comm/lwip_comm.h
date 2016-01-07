@@ -4,7 +4,8 @@
 #include "task_priority.h"   
 
 #define LWIP_MAX_DHCP_TRIES		4   //DHCP服务器最大重试次数
-   
+
+extern u8 server_ip[4];
 
 //lwip控制结构体
 typedef struct  
