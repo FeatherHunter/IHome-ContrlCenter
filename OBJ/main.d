@@ -86,4 +86,4 @@
 ..\OBJ\main.o: ..\HARDWARE\PWM\pwm.h
 ..\OBJ\main.o: ..\HARDWARE\LSENS\lsens.h
 ..\OBJ\main.o: ..\HARDWARE\ADC3\adc3.h
-..\OBJ\main.o: ..\LWIP\lwip_app\tcp_client_netconn\tcp_client_netconn.h
+..\OBJ\main.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h

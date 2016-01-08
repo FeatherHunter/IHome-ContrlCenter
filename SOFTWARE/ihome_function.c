@@ -44,7 +44,9 @@ OS_EVENT * dht11_event;
  */
 void led_task(void *pdata)
 {
+	char * auth_msg = NULL;
 	char * msg = NULL;
+	char * id_msg = NULL;
 	u8 * send_buf;
 	u32 lsens;
 	INT8U err;
@@ -52,6 +54,7 @@ void led_task(void *pdata)
 	while(1)
 	{
 		DEBUG("led task!\r\n");
+		LED1 =! LED1;
 		if(ihome_start_flag == IHome_START)//开启了IHome模式
 		{
 			lsens = (Lsens_Get_Val()+10)*5;
@@ -64,59 +67,100 @@ void led_task(void *pdata)
 				TIM_SetCompare1(TIM14, lsens);
 			}
 		}
-		msg = (char *)OSQPend (led_event,
-                500,  //wait 500ms
+		auth_msg = (char *)OSQPend (led_event,
+                400,  //wait 500ms
                 &err);
 		if(err != OS_ERR_NONE)
 		{
-			//DEBUG("LED TASK OSQPend error %s %d\n", __FILE__, __LINE__);
+			DEBUG("LED TASK OSQPend error %s %d\n", __FILE__, __LINE__);
 			continue; //没有接收到指令
 		}
-		if(strcmp(msg, "ON") == 0)
+		if(strcmp(auth_msg, "client") == 0)
 		{
- 			myfree(SRAMEX, msg);
 			msg = (char *)OSQPend (led_event,
-                2000,  //wait 2000ms
+                500,  //wait 500ms
                 &err);
- 			if(strcmp(msg, "0") == 0)
- 			{
- 				TIM_SetCompare1(TIM14, 0);
-				/*发送状态信息*/
-				send_buf = mymalloc(SRAMEX, 74); //32(account)+32(ID)+9+1 状态指令最高上限
-				sprintf((char *)send_buf, "%c%c975559549h%c%c%c%c%c%s%c%c",
+			if(err != OS_ERR_NONE)
+			{
+				DEBUG("LED TASK OSQPend error %s %d\n", __FILE__, __LINE__);
+				continue; //没有接收到指令
+			}
+			if(strcmp(msg, "ON") == 0)
+			{
+				myfree(SRAMEX, msg);
+				id_msg = (char *)OSQPend (led_event,
+                500,  //wait 2000ms
+                &err);
+				if(err != OS_ERR_NONE)
+				{	
+					DEBUG("LED TASK OSQPend error %s %d\n", __FILE__, __LINE__);
+					continue; //没有接收到指令
+				}
+				if(strcmp(id_msg, "0") == 0)
+				{
+					TIM_SetCompare1(TIM14, 0);
+					/*发送身份给发送任务*/
+					send_buf = mymalloc(SRAMEX, 7);
+					sprintf((char *)send_buf, "client");
+					if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)//为客户端信息
+					{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}		
+					/*发送状态信息*/
+					send_buf = mymalloc(SRAMEX, 74); //32(account)+32(ID)+9+1 状态指令最高上限
+					sprintf((char *)send_buf, "%c%c975559549h%c%c%c%c%c%s%c%c",
 																		COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,
 																		RES_LAMP,COMMAND_SEPERATOR,
 																		LAMP_ON, COMMAND_SEPERATOR, 
 																		"0", COMMAND_SEPERATOR,COMMAND_END);
-				if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)
-				{
-					DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)
+					{
+						DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}
 				}
- 			}
-		}
- 		else if(strcmp(msg, "OFF") == 0)
- 		{
- 			myfree(SRAMEX, msg);
- 			msg = (char *)OSQPend (led_event,
-                 2000,  //wait 2000ms
+			}
+			else if(strcmp(msg, "OFF") == 0)
+			{
+				myfree(SRAMEX, msg);
+				id_msg = (char *)OSQPend (led_event,
+                 500,  //wait 2000ms
                  &err);
-			if(strcmp(msg, "0") == 0)
- 			{
- 				TIM_SetCompare1(TIM14, 500);
-				/*发送状态信息*/
-				send_buf = mymalloc(SRAMEX, 74); //32(account)+32(ID)+9+1 状态指令最高上限
-				sprintf((char *)send_buf, "%c%c975559549h%c%c%c%c%c%s%c%c",
+				if(err != OS_ERR_NONE)
+				{	
+					DEBUG("LED TASK OSQPend error %s %d\n", __FILE__, __LINE__);
+					continue; //没有接收到指令
+				}
+				if(strcmp(id_msg, "0") == 0)
+				{
+					TIM_SetCompare1(TIM14, 500);
+					/*发送身份给发送任务*/
+					send_buf = mymalloc(SRAMEX, 7);
+					sprintf((char *)send_buf, "client");
+					if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)//为客户端信息
+					{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}
+					/*发送状态信息*/
+					send_buf = mymalloc(SRAMEX, 74); //32(account)+32(ID)+9+1 状态指令最高上限
+					sprintf((char *)send_buf, "%c%c975559549h%c%c%c%c%c%s%c%c",
  																		COMMAND_RESULT,COMMAND_SEPERATOR,COMMAND_SEPERATOR,
  																		RES_LAMP,COMMAND_SEPERATOR,
  																		LAMP_OFF, COMMAND_SEPERATOR, 
  																		"0", COMMAND_SEPERATOR,COMMAND_END);
-				if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)
-				{
-					printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)
+					{
+						printf("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}
 				}
- 			}
- 		}
+			}
+		
+	  }//client
+		
+		
+		
+		myfree(SRAMEX, auth_msg);
 		myfree(SRAMEX, msg);
+		myfree(SRAMEX, id_msg);
 		OSTimeDlyHMSM(0,0,0,10);  //延时10ms
  	}
 }
@@ -130,6 +174,7 @@ void led_task(void *pdata)
  */
 void dht11_task(void *pdata)
 {
+	char * msg = NULL;
 	char * msg1 = NULL;
 	char * msg2 = NULL;
 	u8 temp, humi;
@@ -137,35 +182,55 @@ void dht11_task(void *pdata)
 	INT8U err;
 	while(1)
 	{
-		msg1 = (char *)OSQPend (dht11_event,
-                0,  //wait forever
+		msg = (char *)OSQPend (dht11_event,
+                0,  //wait 500ms
                 &err);
 		if(err != OS_ERR_NONE)
 		{
-			//DEBUG("msg1 OSQPend error :%d \r\n", err);
+				DEBUG("LED TASK OSQPend error %s %d\n", __FILE__, __LINE__);
+				continue; //没有接收到指令
+		}
+		msg1 = (char *)OSQPend (dht11_event,
+                500,  //wait forever
+                &err);
+		if(err != OS_ERR_NONE)
+		{
+			DEBUG("msg1 OSQPend error :%d \r\n", err);
+			myfree(SRAMEX, msg);
 			continue; //接收错误
 		}
  		msg2 = (char *)OSQPend (dht11_event,
-                 2000,  //wait 2000ms
+                 500,  //wait 2000ms
                  &err);
 		if(err != OS_ERR_NONE)
 		{
-			//DEBUG("msg2 OSQPend error %s %d\n", __FILE__, __LINE__);
+			DEBUG("msg2 OSQPend error %s %d\n", __FILE__, __LINE__);
+			myfree(SRAMEX, msg);
+			myfree(SRAMEX, msg1);
 			continue; //接收错误
 		}
 		DEBUG("msg1:%s\n", msg1);
 		DEBUG("msg2:%s\n", msg2);
-		if(strcmp(msg1, "TEMP") == 0)
+		if(strcmp(msg, "client") == 0)
 		{
-			if(strcmp(msg2, "10000") == 0)
- 			{
-				if(DHT11_Read_Data((u8*)&temp, (u8*)&humi)==1)
+			if(strcmp(msg1, "TEMP") == 0)
+			{
+				if(strcmp(msg2, "10000") == 0)
 				{
-					continue;//获取温度失败
-				}
-				/*返回温度信息*/
-				send_buf = mymalloc(SRAMEX, 74); //32(account)+32(ID)+9+1 状态指令最高上限
-				sprintf((char *)send_buf, "%c%c975559549h%c"
+					if(DHT11_Read_Data((u8*)&temp, (u8*)&humi)==1)
+					{
+						continue;//获取温度失败
+					}
+					/*返回温度信息*/
+					send_buf = mymalloc(SRAMEX, 7);
+					sprintf((char *)send_buf, "client");
+					if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)//为客户端信息
+					{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}
+					
+					send_buf = mymalloc(SRAMEX, 74); //32(account)+32(ID)+9+1 状态指令最高上限
+					sprintf((char *)send_buf, "%c%c975559549h%c"
 																		"%c%c"
 																			"%s%c"
 																				"%c%c%c",
@@ -173,24 +238,31 @@ void dht11_task(void *pdata)
  																		 RES_TEMP,COMMAND_SEPERATOR,
  																		  msg2, COMMAND_SEPERATOR,  //设备号
  																		    temp, COMMAND_SEPERATOR,COMMAND_END);
-				if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)
-				{
-					DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)
+					{
+						DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}
 				}
- 			}
 
-		}//end of (strcmp(msg, "TEMP") == 0)
-		else if(strcmp(msg1, "HUMI") == 0)
-		{
-			if(strcmp(msg2, "10000") == 0)
- 			{
-				if(DHT11_Read_Data((u8*)&temp, (u8*)&humi)==1)
+			}//end of (strcmp(msg, "TEMP") == 0)
+			else if(strcmp(msg1, "HUMI") == 0)
+			{
+				if(strcmp(msg2, "10000") == 0)
 				{
-					continue;//获取温度失败
-				}
-				/*返回湿度信息*/
-				send_buf = mymalloc(SRAMEX, 74); //32(account)+32(ID)+9+1 状态指令最高上限
-				sprintf((char *)send_buf, "%c%c975559549h%c"
+					if(DHT11_Read_Data((u8*)&temp, (u8*)&humi)==1)
+					{
+						continue;//获取温度失败
+					}
+					/*返回湿度信息*/
+					send_buf = mymalloc(SRAMEX, 7);
+					sprintf((char *)send_buf, "client");
+					if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)//为客户端信息
+					{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}
+					
+					send_buf = mymalloc(SRAMEX, 74); //32(account)+32(ID)+9+1 状态指令最高上限
+					sprintf((char *)send_buf, "%c%c975559549h%c"
 																	"%c%c"
 																	"%s%c"
 																	"%c%c%c",
@@ -198,13 +270,15 @@ void dht11_task(void *pdata)
  																	RES_HUMI,COMMAND_SEPERATOR,
  			  													msg2, COMMAND_SEPERATOR,  //设备号
  																	humi, COMMAND_SEPERATOR,COMMAND_END);
-				if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)
-				{
-					DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					if(OSQPost(client_send_event,send_buf) != OS_ERR_NONE)
+					{
+						DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}
 				}
- 			}
-		}//end of strcmp(msg, "HUMI") == 0
+			}//end of strcmp(msg, "HUMI") == 0
+		}
 		
+		myfree(SRAMEX, msg);
 		myfree(SRAMEX, msg1);
 		myfree(SRAMEX, msg2);
 		OSTimeDlyHMSM(0,0,0,10);  //延时10ms

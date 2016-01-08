@@ -3,12 +3,12 @@
 #include "includes.h"
 
 /*led消息队列*/
-#define MSGSIZE 2
+#define MSGSIZE 6
 extern void *led_q[MSGSIZE];
 extern OS_EVENT * led_event;
 
 /*dht11 消息队列*/
-#define DHT11SIZE 2
+#define DHT11SIZE 6
 extern void *dht11_q[DHT11SIZE];
 extern OS_EVENT * dht11_event;
 

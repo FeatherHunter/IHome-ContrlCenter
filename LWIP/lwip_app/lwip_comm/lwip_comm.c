@@ -24,7 +24,7 @@
 #include "usart.h"  
 #include <stdio.h>
 #include "ucos_ii.h"  
-#include "tcp_client_netconn.h"
+#include "tcp_client.h"
 #include "idebug.h"
 
 u8 server_ip[4] = {139, 129, 19, 115};

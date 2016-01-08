@@ -47,7 +47,7 @@ void led_task(void *pdata);
 
 /*DHT11хннЯ*/
 #define DHT11_TASK_PRIO		19
-#define DHT11_STK_SIZE		64
+#define DHT11_STK_SIZE		128
 extern OS_STK	DHT11_TASK_STK[DHT11_STK_SIZE];
 void dht11_task(void *pdata);
 

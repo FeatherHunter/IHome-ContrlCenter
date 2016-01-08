@@ -19,7 +19,7 @@
 #include "message_queue.h"
 #include "pwm.h"
 #include "lsens.h"
-#include "tcp_client_netconn.h"
+#include "tcp_client.h"
 /*start»ŒŒÒ*/
 OS_STK START_TASK_STK[START_STK_SIZE];
 void start_task(void *pdata); 
