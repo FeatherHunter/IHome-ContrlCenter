@@ -1,15 +1,22 @@
+Copyright 版权所有 @IFuture Technology
 
-本实验所需器材：STM32F407开发板块，网线一根。
+本项目是IFuture科技公司(intelligent future technolgy)旗下IHome(智能家庭)项目中家庭控制终端项目
 
-本实验将实现如下功能：用网线将开发板连接到路由器上，如果没有路由器的话按照我们开发手册中的方法连接到电脑上。开机的时候将初始化LAN8720、LWIP协议栈等，LAN8720会自动与路由器或者电脑进行自协商，通过自协商确定连接速度与双工状态。如果开启了DHCP的话开发板就会通过路由器获取IP地址，如果没有路由器的话只能使用静态IP地址，我们默认的静态IP地址为:192.168.1.30,子网掩码：255.255.255.0，默认网关:192.168.1.1。当DHCP获取IP地址信息成功后就会在LCD上显示，我们可以通过ping开发板的IP地址查看网络是否正常，如果通过DHCP获取IP地址失败的话就会自动使用默认的IP地址。
+基于stm32,移植了ucosII和lwip,开发平台keil
 
-注意：本实验使用了UCOS操作系统，如果没有插网线并且开启了DHCP的话就会等待很久！
+项目负责人:feather(王辰浩)
 
+项目文件指引:
+  1.USER           main.c、
+		   instructions.h   自定义通信协议指令
+		   idebug.h	    调试BUG宏
+  2.LWIP/lwip_app  tcp_client.c     stm32作为客户端连接外网服务器
+	           tcp_server.c     stm32作为wifi内网中的服务器
+  3.SOFTWARE       ihome_function.c 控制终端各种设备的控制任务
+  4.HARDWARE       各种硬件设备的初始化以及使用
 
-               	正点原子@ALIENTEK
-               	2014-11-3
-		广州市星翼电子科技有限公司
-                联系电话（传真）：020-38271790
-	       	购买：http://shop62103354.taobao.com
-                      http://shop62057469.taobao.com
-               	技术支持论坛：www.openedv.com
+版本信息与功能介绍:
+
+v2.0  @Date:2015/12/26  移植ucosII和lwip,使用RAW编程接口。实现基本登录,灯,温湿度,智能家居模式
+v2.10 @Date:2016/1/8    重做架构，采用NETCONN编程接口。使用自定义通信协议,提升指令解析和网络通信效率。降低控制延时。
+
