@@ -91,3 +91,4 @@
 ..\OBJ\lwip_comm.o: ..\SYSTEM\usart\usart.h
 ..\OBJ\lwip_comm.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
 ..\OBJ\lwip_comm.o: ..\USER\idebug.h
+..\OBJ\lwip_comm.o: ..\HARDWARE\LCD\lcd.h

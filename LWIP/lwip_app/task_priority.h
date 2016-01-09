@@ -1,6 +1,13 @@
 #ifndef _H_TASK_PRIORITY
 #define	_H_TASK_PRIORITY
 
+/**
+ * @copyright 王辰浩(2015~2025) QQ：975559549
+ * @Author Feather @version 2.0 @date 2016.1.9
+ * @filename task_priority.h
+ * @description 宏定义了所有任务的优先级,堆栈大小,便于修改
+ */ 
+
 #include "sys.h"
 #include "lwip/debug.h"
 #include "lwip/stats.h"
@@ -15,40 +22,53 @@
 extern OS_STK * LWIP_DHCP_TASK_STK;	
 void lwip_dhcp_task(void *pdata); 
 
-/*TCP 客户端 链接认证 任务*/
+
+/*TCP client*/
 #define TCP_CLIENT_CONNECT_TASK_PRIO       		6
 #define TCP_CLIENT_CONNECT_STK_SIZE  		    128
 extern OS_STK * TCP_CLIENT_CONNECT_TASK_STK;	
 void tcp_client_connect(void *arg);
 
-/*TCP 客户端 接收服务器信息 任务*/
-#define TCP_CLIENT_RECV_TASK_PRIO       		7
+/*tcp server*/
+#define TCPSERVER_PRIO		7
+#define TCPSERVER_STK_SIZE	128
+extern OS_STK * TCPSERVER_TASK_STK;
+void tcp_server_task(void *arg);
+
+/*TCP client receive message task*/
+#define TCP_CLIENT_RECV_TASK_PRIO       		8
 #define TCP_CLIENT_RECV_STK_SIZE  		    128
-extern OS_STK TCP_CLIENT_RECV_TASK_STK[TCP_CLIENT_RECV_STK_SIZE];	
+extern OS_STK * TCP_CLIENT_RECV_TASK_STK;	
 void tcp_client_recv(void *arg);
 
+/*TCP server receive message task*/
+#define TCPSERVER_RECV_TASK_PRIO       		9
+#define TCPSERVER_RECV_STK_SIZE  		    128
+extern OS_STK * TCPSERVER_RECV_TASK_STK;	
+void tcp_server_recv(void *arg);
+
 /*处理控制中心接收到的消息*/
-#define CLIENT_HANDLE_TASK_PRIO       		9
+#define CLIENT_HANDLE_TASK_PRIO       		10
 #define CLIENT_HANDLE_STK_SIZE  		    128
 extern OS_STK * CLIENT_HANDLE_TASK_STK;	
-void client_handle_task(void *arg);
+void tcp_handle_task(void *arg);
 
-/*TCP 客户端 发送信息 任务*/
-#define TCP_CLIENT_SEND_TASK_PRIO       		10
-#define TCP_CLIENT_SEND_STK_SIZE  		    128
-extern OS_STK TCP_CLIENT_SEND_TASK_STK[TCP_CLIENT_SEND_STK_SIZE];	
-void tcp_client_send(void *arg);
+/*tcp send msg task*/
+#define TCP_SEND_TASK_PRIO       	11
+#define TCP_SEND_STK_SIZE  		    128
+extern OS_STK * TCP_SEND_TASK_STK;	
+void tcp_send_task(void *arg);
 
 /*LED任务*/
 #define LED_TASK_PRIO		18
-#define LED_STK_SIZE		64
-extern OS_STK	LED_TASK_STK[LED_STK_SIZE];
+#define LED_STK_SIZE		128
+extern OS_STK	* LED_TASK_STK;
 void led_task(void *pdata);
 
 /*DHT11任务*/
 #define DHT11_TASK_PRIO		19
 #define DHT11_STK_SIZE		128
-extern OS_STK	DHT11_TASK_STK[DHT11_STK_SIZE];
+extern OS_STK	* DHT11_TASK_STK;
 void dht11_task(void *pdata);
 
 /*start任务*/

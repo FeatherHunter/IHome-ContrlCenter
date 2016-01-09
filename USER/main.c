@@ -20,9 +20,15 @@
 #include "pwm.h"
 #include "lsens.h"
 #include "tcp_client.h"
+#include "instructions.h"
+#include "main.h"
 /*start任务*/
 OS_STK START_TASK_STK[START_STK_SIZE];
 void start_task(void *pdata); 
+
+const char master[ACCOUNT_MAX + 1] = "975559549";
+const char slave[ACCOUNT_MAX + 1] = "975559549h";
+char password[ACCOUNT_MAX + 1] = "545538516";
 
 int main(void)
 {
@@ -38,31 +44,35 @@ int main(void)
 	TIM14_PWM_Init(500-1,84-1);	//PF9 PWM,84M/84=1Mhz计数频率,重装载值500,所以PWM频率为 1M/500=2Khz. 
 	Lsens_Init();               //光敏电阻初始化
 	
+	POINT_COLOR = RED;
+	LCD_ShowString(50,20,200,20,16,"Welcome to IHome");
+	
+	LCD_ShowString(20,40,200,20,16,  "DHT11 initing....");
 	while(DHT11_Init())//温湿度传感器
 	{
-		LCD_ShowString(30,30,200,20,16,"DHT11 init error!");
+		LCD_ShowString(20,40,200,20,16,"DHT11 init error!");
 		delay_ms(250);
-		LCD_ShowString(30,30,200,20,16,"DHT11 initing....");
+		LCD_ShowString(20,40,200,20,16,"DHT11 initing....");
 		delay_ms(250);
 	}
-	LCD_ShowString(30,30,200,20,16,  "                 ");
+	LCD_ShowString(20,40,200,20,16,  "                 ");
 	
 	mymem_init(SRAMIN);  	//初始化内部内存池
 	mymem_init(SRAMEX);  	//初始化外部内存池
 	mymem_init(SRAMCCM); 	//初始化CCM内存池
-	
-	POINT_COLOR = RED; 		//红色字体
-	LCD_ShowString(30,30,200,20,16,"IHome");
 
 	OSInit(); 					//UCOS初始化
+	POINT_COLOR = RED;
+	LCD_ShowString(20,60,200,20,16,  "Lwip Initing.....");
 	while(lwip_comm_init()) 	//lwip初始化
 	{
-		LCD_ShowString(30,110,200,20,16,"Lwip Init failed!"); 	//lwip初始化失败
+		LCD_ShowString(20,60,200,20,16,"Lwip Init failed!"); 	//lwip初始化失败
 		delay_ms(500);
-		LCD_Fill(30,110,230,150,WHITE);
+		LCD_Fill(20,60,230,150,WHITE);
 		delay_ms(500);
 	}
-	LCD_ShowString(30,110,200,20,16,"Lwip Init Success!"); 		//lwip初始化成功
+	POINT_COLOR = GREEN;
+	LCD_ShowString(20,60,200,20,16,"Lwip Init Success!"); 		//lwip初始化成功
 	
 	OSTaskCreate(start_task,(void*)0,(OS_STK*)&START_TASK_STK[START_STK_SIZE-1],START_TASK_PRIO);
 	OSStart(); //开启UCOS
@@ -77,15 +87,16 @@ void start_task(void *pdata)
 	OSStatInit();  			//初始化统计任务
 	OS_ENTER_CRITICAL();  	//关中断
 	
-	dht11_event           = OSQCreate(&dht11_q[0]        , DHT11SIZE);
-	led_event             = OSQCreate(&led_q[0]          , MSGSIZE);
-	client_send_event     = OSQCreate(&client_send_q[0]  , SENDSIZE);   //创建处理消息队列
-  client_handle_event   = OSQCreate(&client_handle_q[0], HANDLESIZE); //创建发送消息队列
+	dht11_event       = OSQCreate(&dht11_q[0]     , DHT11SIZE);
+	led_event         = OSQCreate(&led_q[0]       , MSGSIZE);
+	tcp_send_event    = OSQCreate(&tcp_send_q[0]  , SENDSIZE);   //创建处理消息队列
+  tcp_handle_event  = OSQCreate(&tcp_handle_q[0], HANDLESIZE); //创建发送消息队列
 	
 #if LWIP_DHCP
 	lwip_comm_dhcp_creat(); //创建DHCP任务
 #endif
-	
+	LED_TASK_STK   = mymalloc(SRAMEX, LED_STK_SIZE*sizeof(OS_STK));
+	DHT11_TASK_STK = mymalloc(SRAMEX, DHT11_STK_SIZE*sizeof(OS_STK));
 	OSTaskCreate(led_task,(void*)0,(OS_STK*)&LED_TASK_STK[LED_STK_SIZE-1],LED_TASK_PRIO);//创建LED任务
  	OSTaskCreate(dht11_task,(void*)0,(OS_STK*)&DHT11_TASK_STK[DHT11_STK_SIZE-1],DHT11_TASK_PRIO);//创建DHT11任务
 	

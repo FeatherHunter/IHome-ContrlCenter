@@ -81,3 +81,7 @@
 ..\OBJ\tcp_server.o: ..\LWIP\lwip-1.4.1\src\include\lwip/netbuf.h
 ..\OBJ\tcp_server.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
 ..\OBJ\tcp_server.o: ..\USER\message_queue.h
+..\OBJ\tcp_server.o: ..\USER\main.h
+..\OBJ\tcp_server.o: ..\USER\instructions.h
+..\OBJ\tcp_server.o: ..\HARDWARE\KEY\key.h
+..\OBJ\tcp_server.o: ..\HARDWARE\LCD\lcd.h
