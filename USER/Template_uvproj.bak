@@ -350,7 +350,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\FWLIB\STM32F4xx_StdPeriph_Driver\inc;..\USER;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\ETHERNET;..\HARDWARE\TIMER;..\HARDWARE\LED;..\HARDWARE\SRAM;..\FWLIB\STM32F4x7_ETH_Driver\inc;..\MALLOC;..\USMART;..\LWIP;..\LWIP\arch;..\LWIP\lwip_header;..\LWIP\app\TCP_Client;..\LWIP\lwip_app\lwip_comm;..\LWIP\lwip-1.4.1\src\include;..\LWIP\lwip-1.4.1\src\include\ipv4;..\LWIP\lwip-1.4.1\src\include\lwip;..\LWIP\lwip-1.4.1\src\include\netif;..\UCOSII\CONFIG;..\UCOSII\CORE;..\UCOSII\PORT;..\LWIP\lwip_app;..\LWIP\lwip_app\tcp_client;..\SOFTWARE;..\HARDWARE\DHT11;..\HARDWARE\LSENS;..\HARDWARE\ADC3;..\HARDWARE\PWM;..\LWIP\lwip_app\tcp_client_netconn</IncludePath>
+              <IncludePath>..\CORE;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\FWLIB\STM32F4xx_StdPeriph_Driver\inc;..\USER;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\ETHERNET;..\HARDWARE\TIMER;..\HARDWARE\LED;..\HARDWARE\SRAM;..\FWLIB\STM32F4x7_ETH_Driver\inc;..\MALLOC;..\USMART;..\LWIP;..\LWIP\arch;..\LWIP\lwip_header;..\LWIP\app\TCP_Client;..\LWIP\lwip_app\lwip_comm;..\LWIP\lwip-1.4.1\src\include;..\LWIP\lwip-1.4.1\src\include\ipv4;..\LWIP\lwip-1.4.1\src\include\lwip;..\LWIP\lwip-1.4.1\src\include\netif;..\UCOSII\CONFIG;..\UCOSII\CORE;..\UCOSII\PORT;..\LWIP\lwip_app;..\LWIP\lwip_app\tcp_client;..\SOFTWARE;..\HARDWARE\DHT11;..\HARDWARE\LSENS;..\HARDWARE\ADC3;..\HARDWARE\PWM;..\LWIP\lwip_app\tcp_client_netconn;..\LWIP\lwip_app\tcp_server</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -592,9 +592,14 @@
               <FilePath>..\LWIP\lwip_app\lwip_comm\lwip_comm.c</FilePath>
             </File>
             <File>
-              <FileName>tcp_client_netconn.c</FileName>
+              <FileName>tcp_client.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\LWIP\lwip_app\tcp_client_netconn\tcp_client_netconn.c</FilePath>
+              <FilePath>..\LWIP\lwip_app\tcp_client\tcp_client.c</FilePath>
+            </File>
+            <File>
+              <FileName>tcp_server.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LWIP\lwip_app\tcp_server\tcp_server.c</FilePath>
             </File>
           </Files>
         </Group>

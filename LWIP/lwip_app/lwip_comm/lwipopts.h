@@ -45,7 +45,7 @@
 #define TCP_SND_QUEUELEN        (2* TCP_SND_BUF/TCP_MSS)	//TCP_SND_QUEUELEN: TCP发送缓冲区大小(pbuf).这个值最小为(2 * TCP_SND_BUF/TCP_MSS)
 #define TCP_WND                 (2*TCP_MSS)		//TCP发送窗口
 #define LWIP_ICMP               1 	//使用ICMP协议
-#define LWIP_DHCP               1	  //使用DHCP
+#define LWIP_DHCP               1	//使用DHCP
 #define LWIP_UDP                1 	//使用UDP服务
 #define UDP_TTL                 255 //UDP数据包生存时间
 #define LWIP_STATS 0
@@ -87,7 +87,7 @@
 #define LWIP_NETCONN                    1 	//LWIP_NETCONN==1:使能NETCON函数(要求使用api_lib.c)
 #define LWIP_SOCKET                     1	//LWIP_SOCKET==1:使能Sicket API(要求使用sockets.c)
 #define LWIP_COMPAT_MUTEX               1
-#define LWIP_SO_RCVTIMEO                1 	//通过定义LWIP_SO_RCVTIMEO使能netconn结构体中recv_timeout,使用recv_timeout可以避免阻塞线程
+#define LWIP_SO_RCVTIMEO                0 	//通过定义LWIP_SO_RCVTIMEO使能netconn结构体中recv_timeout,使用recv_timeout可以避免阻塞线程
 
 //有关系统的选项
 #define TCPIP_THREAD_STACKSIZE          1000	//内核任务堆栈大小

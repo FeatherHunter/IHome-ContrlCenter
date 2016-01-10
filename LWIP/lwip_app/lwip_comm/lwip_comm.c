@@ -27,6 +27,7 @@
 #include "tcp_client.h"
 #include "idebug.h"
 #include "lcd.h"
+#include "main.h"
 
 u8 server_ip[4] = {139, 129, 19, 115};
 
@@ -188,6 +189,7 @@ void lwip_comm_dhcp_delete(void)
 //DHCP处理任务
 void lwip_dhcp_task(void *pdata)
 {
+	u8 res;
 	u8 ip_buf[20]; //存放ip用于显示
 	u32 ip=0,netmask=0,gw=0;
 	dhcp_start(&lwip_netif);//开启DHCP 
@@ -247,19 +249,19 @@ void lwip_dhcp_task(void *pdata)
 	LCD_ShowString(20, 100, 160, 20, 16, "TCP initing....."); //显示IP到屏幕上	
 	while(tcp_client_init()) 									//初始化tcp_client(创建tcp_client线程)
 	{
-		DEBUG("TCP Client failed!!"); //tcp客户端创建失败
+		DEBUG("TCP Client failed!!\n"); //tcp客户端创建失败
 		delay_ms(1000);
 	}
-	DEBUG("TCP Client Success!"); 	//tcp客户端创建成功
-	while(tcp_server_init()) 									//初始化tcp_client(创建tcp_client线程)
+	DEBUG("TCP Client Success!\n"); 	//tcp客户端创建成功
+	while((res = tcp_server_init())!=0) 									//初始化tcp_client(创建tcp_client线程)
 	{
-		DEBUG("TCP Server failed!!"); //tcp客户端创建失败
+		DEBUG("TCP Server failed:%d %d %d!!\n", res, OS_ERR_PRIO_INVALID, OS_ERR_TASK_CREATE_ISR); //tcp客户端创建失败
 		delay_ms(1000);
 	}
-	DEBUG("TCP Server Success!"); 	//tcp客户端创建成
+	DEBUG("TCP Server Success!\n"); 	//tcp客户端创建成
 	POINT_COLOR = RED;
 	LCD_ShowString(20, 100, 160, 20, 16, "TCP init success"); //显示IP到屏幕上
-	//lwip_comm_dhcp_delete();//删除DHCP任务 
+	lwip_comm_dhcp_delete();//删除DHCP任务 
 }
 
 #endif 

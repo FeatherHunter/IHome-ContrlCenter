@@ -31,7 +31,7 @@ void tcp_client_connect(void *arg);
 
 /*tcp server*/
 #define TCPSERVER_PRIO		7
-#define TCPSERVER_STK_SIZE	128
+#define TCPSERVER_STK_SIZE	300
 extern OS_STK * TCPSERVER_TASK_STK;
 void tcp_server_task(void *arg);
 

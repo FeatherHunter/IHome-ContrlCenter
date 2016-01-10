@@ -92,3 +92,9 @@
 ..\OBJ\lwip_comm.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
 ..\OBJ\lwip_comm.o: ..\USER\idebug.h
 ..\OBJ\lwip_comm.o: ..\HARDWARE\LCD\lcd.h
+..\OBJ\lwip_comm.o: ..\USER\main.h
+..\OBJ\lwip_comm.o: ..\USER\message_queue.h
+..\OBJ\lwip_comm.o: ..\USER\instructions.h
+..\OBJ\lwip_comm.o: ..\HARDWARE\KEY\key.h
+..\OBJ\lwip_comm.o: ..\HARDWARE\LED\led.h
+..\OBJ\lwip_comm.o: ..\LWIP\lwip_app\tcp_server\tcp_server.h

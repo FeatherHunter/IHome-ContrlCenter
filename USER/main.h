@@ -8,6 +8,8 @@
 #include "lcd.h"
 #include "led.h"
 #include "malloc.h"
+#include "tcp_client.h"
+#include "tcp_server.h"
 
 #define TCP_RX_BUFSIZE	    200	  //接收缓冲区长度
 #define REMOTE_PORT				  8080	//port: stm32 as client to connect server by ethernet

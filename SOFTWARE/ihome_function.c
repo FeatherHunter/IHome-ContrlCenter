@@ -49,7 +49,7 @@ void led_task(void *pdata)
 	
 	while(1)
 	{
-		DEBUG("led task!\r\n");
+		//DEBUG("led task!\r\n");
 		LED1 =! LED1;
 		if(ihome_start_flag == IHome_START)//开启了IHome模式
 		{
@@ -68,7 +68,7 @@ void led_task(void *pdata)
                 &err);
 		if(err != OS_ERR_NONE)
 		{
-			DEBUG("LED TASK OSQPend error %s %d\n", __FILE__, __LINE__);
+			//DEBUG("LED TASK OSQPend error %s %d\n", __FILE__, __LINE__);
 			continue; //没有接收到指令
 		}
 		if(strcmp(auth_msg, "client") == 0)

@@ -78,6 +78,8 @@
 ..\OBJ\ihome_function.o: ..\HARDWARE\LCD\lcd.h
 ..\OBJ\ihome_function.o: ..\HARDWARE\LED\led.h
 ..\OBJ\ihome_function.o: ..\MALLOC\malloc.h
+..\OBJ\ihome_function.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
+..\OBJ\ihome_function.o: ..\LWIP\lwip_app\tcp_server\tcp_server.h
 ..\OBJ\ihome_function.o: ..\SOFTWARE\ihome_function.h
 ..\OBJ\ihome_function.o: ..\HARDWARE\DHT11\dht11.h
 ..\OBJ\ihome_function.o: ..\HARDWARE\LSENS\lsens.h

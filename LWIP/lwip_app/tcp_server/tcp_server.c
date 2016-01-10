@@ -64,22 +64,22 @@ INT8U tcp_server_init(void)
 void tcp_server_task(void *arg)
 {
 	err_t err;
+	u8 * msg_buf;
 	static ip_addr_t ipaddr;
 	static u16_t 			port;
 	
 	LWIP_UNUSED_ARG(arg);
-
 	conn = netconn_new(NETCONN_TCP);  //创建一个TCP链接
-	netconn_bind(conn,IP_ADDR_ANY,TCP_SERVER_PORT);  //绑定端口 8080号端口
-	netconn_listen(conn);  		//进入监听模式
+	err = netconn_bind(conn,IP_ADDR_ANY,TCP_SERVER_PORT);  //绑定端口 8080号端口
+	err = netconn_listen(conn);  		//进入监听模式
 	while (1) 
 	{
+		printf("accepting!\n");
 		err = netconn_accept(conn,&serverconn);  //接收连接请求
-
+		printf("accepted!\n");
 		if (err == ERR_OK)    //处理新连接的数据
 		{ 
 			netconn_getaddr(serverconn,&ipaddr,&port,0); //获取远端IP地址和端口号
-			
 			user_addr[3] = (uint8_t)(ipaddr.addr >> 24); 
 			user_addr[2] = (uint8_t)(ipaddr.addr>> 16);
 			user_addr[1] = (uint8_t)(ipaddr.addr >> 8);
@@ -97,9 +97,28 @@ void tcp_server_task(void *arg)
 				else
 				{
 					DEBUG("user is checked\r\n");
+					/*--------------发送任意信息给用户,确认连接状态------------------------------*/
+					msg_buf = mymalloc(SRAMEX, 7);
+					sprintf((char *)msg_buf, "server");
+					if(OSQPost(tcp_send_event, msg_buf) != OS_ERR_NONE)//为客户端信息
+					{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}	
+					msg_buf = mymalloc(SRAMEX, 4);//外部内存分配空间
+					sprintf((char *)msg_buf, "%c%c%c",
+																		COMMAND_PULSE,COMMAND_SEPERATOR,COMMAND_END);
+					if(OSQPost(tcp_send_event,msg_buf) != OS_ERR_NONE)
+					{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}
+					OSTimeDlyHMSM(0,0,10,0);
 				}
 				OSTimeDlyHMSM(0,0,2,0);
 			}
+		}
+		else
+		{
+			DEBUG("tcp_server_task accept error!\r\n");
 		}
 	}//end of while(1)
 }

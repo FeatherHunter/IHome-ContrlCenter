@@ -1,3 +1,16 @@
+/**
+ * @copyright 王辰浩(2015~2025) QQ：975559549
+ * @Author Feather @version 2.3 @date 2016.1.10
+ * @filename task_client.c
+ * @description tcp client tasks about client_recv,client_connect,tcp_send,tcp_handle_message
+ * @FunctionList
+ *		1.INT8U tcp_client_init(void);       //create tasks for stm32 as client
+ *		2.void tcp_client_connect(void *arg) //stm32 keep connecting with server
+ *    3.void tcp_client_recv(void *arg)    //stm32 receive message as client
+ *		4.void tcp_handle_task(void *arg);   //handle message as client or server
+ *    5.void tcp_send_task(void *arg);     //send message as client or server
+ */ 
+
 #include "main.h"
 #include "tcp_client.h"
 #include "tcp_server.h"
@@ -11,7 +24,6 @@
 #include "includes.h"
 
 struct netconn *tcp_clientconn;					//TCP CLIENT网络连接结构体
-u8 tcp_client_flag;		//TCP客户端数据发送标志位
 
 u8 isConnected = 0;
 u8 isAuthed    = 0;
@@ -19,8 +31,9 @@ u8 isAuthed    = 0;
 /*TCP 客户端堆栈*/
 OS_STK * TCP_CLIENT_CONNECT_TASK_STK;	//链接
 OS_STK * TCP_CLIENT_RECV_TASK_STK;	  //接收
+
+/*TCP handle and send STK*/
 OS_STK * CLIENT_HANDLE_TASK_STK;	    //处理
-/*TCP send stack*/
 OS_STK * TCP_SEND_TASK_STK;	          //发送
 
 /*handle消息队列*/
@@ -59,7 +72,13 @@ INT8U tcp_client_init(void)
 	return res;
 }
 
-//tcp客户端任务函数
+
+/**
+ * @Function: void tcp_client_connect(void *arg)
+ * @Description: stm32 keep connecting with server
+ * @Input : NULL
+ * @Return: NULL
+ */
 void tcp_client_connect(void *arg)
 {
 	u8 * send_buf; //发送消息的缓冲
@@ -121,8 +140,12 @@ void tcp_client_connect(void *arg)
 		OSTimeDlyHMSM(0,0,1,0);//还在连接中睡眠2s
 	}
 }
-
-//tcp客户端发送信息任务函数
+/**
+ * @Function: void tcp_client_recv(void *arg)
+ * @Description: stm32 receive message as client
+ * @Input : NULL
+ * @Return: NULL
+ */
 void tcp_client_recv(void *arg)
 {
 	u8 * auth_msg;
@@ -185,8 +208,6 @@ void tcp_client_recv(void *arg)
 	}
 }
 
-
-
 /**
  * @Function: void handle_message_task(void *arg)
  * @Description: deal with messeages from server and do some actions
@@ -209,7 +230,7 @@ void tcp_handle_task(void *arg)
 	DEBUG("tcp client handle message task\r\n");
 	while(1)
 	{
-		DEBUG("handle message task!\n");
+		DEBUG("handle message task!\r\n");
 		auth_msg = (u8 *)OSQPend (tcp_handle_event,  //等待服务器端 or 客户端 信息
                 0,  //wait forever
                 &err);
@@ -586,6 +607,7 @@ void tcp_handle_task(void *arg)
 									{
 										DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 									}
+									isChecked = 1;
 							}//end of LOGIN SUCCESS
 							else//LOGIN_FAILED 
 							{
@@ -831,6 +853,7 @@ void tcp_send_task(void *arg)
 		{
 			if(strcmp((char *)auth_msg, "client") == 0)//客户端发送给服务器
 			{
+					DEBUG("send as client\r\n");
 					err = netconn_write(tcp_clientconn ,msg,strlen((char*)msg),NETCONN_COPY); //发送tcp_server_sentbuf中的数据
 					if(err != ERR_OK)
 					{
@@ -840,6 +863,7 @@ void tcp_send_task(void *arg)
 			}
 			else if(strcmp((char *)auth_msg, "server") == 0)//作为服务器发送给用户
 			{
+				  DEBUG("send as server\r\n");
 					err = netconn_write(serverconn ,msg,strlen((char*)msg),NETCONN_COPY); //发送tcp_server_sendbuf中的数据
 					if(err != ERR_OK)
 					{

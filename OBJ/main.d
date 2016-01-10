@@ -89,3 +89,4 @@
 ..\OBJ\main.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
 ..\OBJ\main.o: instructions.h
 ..\OBJ\main.o: main.h
+..\OBJ\main.o: ..\LWIP\lwip_app\tcp_server\tcp_server.h
