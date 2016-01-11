@@ -75,6 +75,7 @@ void tcp_server_task(void *arg)
 	while (1) 
 	{
 		printf("accepting!\n");
+		DEBUG_LCD(20, 160, "Accepting......      ", RED);//显示接收到的数据	
 		err = netconn_accept(conn,&serverconn);  //接收连接请求
 		printf("accepted!\n");
 		if (err == ERR_OK)    //处理新连接的数据
@@ -92,7 +93,9 @@ void tcp_server_task(void *arg)
 			{
 				if(isChecked == 0)//身份确认失败
 				{
+					DEBUG_LCD(20, 160, "Client Checking...      ", BLUE);//显示接收到的数据	
 					DEBUG("stm32 is cheking user's id\r\n");
+					OSTimeDlyHMSM(0,0,2,0);
 				}
 				else
 				{

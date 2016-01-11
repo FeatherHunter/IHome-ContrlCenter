@@ -109,8 +109,7 @@ void tcp_client_connect(void *arg)
 				isConnected = 1;
 			  isAuthed = 0;
 			}
-			POINT_COLOR = BLUE;
-			LCD_ShowString(20,100,200,20,16,"connecting...");//显示接收到的数据	
+			DEBUG_LCD(20,120,"connecting Server...", BLUE);//显示接收到的数据	
 			DEBUG("is connecting!\n");
 		}
 		/*--------认证信息---------*/
@@ -133,8 +132,7 @@ void tcp_client_connect(void *arg)
 			{
 					DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 	    }
-			POINT_COLOR = BLUE;
-			LCD_ShowString(20,100,200,20,16,"authting.....");//显示接收到的数据	
+			DEBUG_LCD(20,120,"Client authting.....", BLUE);//显示接收到的数据	
 			DEBUG("is authing!\n");
 		}
 		OSTimeDlyHMSM(0,0,1,0);//还在连接中睡眠2s
@@ -274,7 +272,7 @@ void tcp_handle_task(void *arg)
 				}
 				i++;
 				account[j] = '\0';
-				if((strcmp(account, master) != 0)&&(strcmp(account, slave) != 0)) //排除非SLAVE和MASTER的信息
+				if((strcmp(account, master) != 0)&&(strcmp(account, "SERVER") != 0)) //排除非SLAVE和MASTER的信息
 				{
 					/*当前指令无效,跳转到下一个指令*/
 					while((recv_msg[i] != '\0') && (recv_msg[i] != COMMAND_END)&&(i<TCP_RX_BUFSIZE))//msg[i]=END
@@ -311,13 +309,11 @@ void tcp_handle_task(void *arg)
 							if(res == LOGIN_SUCCESS)
 							{
 								isAuthed = 1;
-								POINT_COLOR = GREEN;
-								LCD_ShowString(20,120,200,20,16,"Login Success");//显示接收到的数据	
+								DEBUG_LCD(20,120,"Login Server Success  ", GREEN);//显示接收到的数据	
 							}
 							else
 							{
-								POINT_COLOR = GREEN;
-								LCD_ShowString(20,120,200,20,16,"Login Failed ");//显示接收到的数据
+								DEBUG_LCD(20,120,"Login Server Failed   ", RED);//显示接收到的数据
 								isAuthed = 0;
 							}
 							i+=3;
@@ -548,7 +544,7 @@ void tcp_handle_task(void *arg)
 				}
 				i++;
 				account[j] = '\0';
-				if((strcmp(account, master) != 0)&&(strcmp(account, slave) != 0)) //排除非SLAVE和MASTER的信息
+				if( strcmp(account, master) != 0) //排除非SLAVE和MASTER的信息
 				{
 					/*当前指令无效,跳转到下一个指令*/
 					while((recv_msg[i] != '\0') && (recv_msg[i] != COMMAND_END)&&(i<TCP_RX_BUFSIZE))//msg[i]=END
@@ -597,6 +593,7 @@ void tcp_handle_task(void *arg)
 							}	
 							if(strcmp(account, password) == 0)//登陆成功
 							{
+								  DEBUG_LCD(20, 160, "Client Login Success    ",GREEN);//显示接收到的数据	
 									/*-------------return msg about login_success to user-----------*/		
 									send_buf = mymalloc(SRAMEX, 74); //32(account)+32(ID)+9+1 状态指令最高上限
 									sprintf((char *)send_buf, "%c%c%s%c%c%c%c%c%c",
@@ -611,6 +608,7 @@ void tcp_handle_task(void *arg)
 							}//end of LOGIN SUCCESS
 							else//LOGIN_FAILED 
 							{
+								  DEBUG_LCD(20, 160, "Client Login Failed       ", RED);
 									/*-------------return msg about login_failed to user-----------*/		
 									send_buf = mymalloc(SRAMEX, 74); //32(account)+32(ID)+9+1 状态指令最高上限
 									sprintf((char *)send_buf, "%c%c%s%c%c%c%c%c%c",
@@ -829,7 +827,7 @@ void tcp_send_task(void *arg)
 	DEBUG("tcp send task\r\n");
 	while(1)
 	{
-		while(!isConnected)
+		while(!isConnected && !isAccepted)
 		{
 			OSTimeDlyHMSM(0,0,2,0);//等待连接好
 		}

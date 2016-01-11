@@ -245,22 +245,20 @@ void lwip_dhcp_task(void *pdata)
 		}  
 		delay_ms(250); //延时250ms
 	}
-	POINT_COLOR = RED;
-	LCD_ShowString(20, 100, 160, 20, 16, "TCP initing....."); //显示IP到屏幕上	
+	DEBUG_LCD(20, 100, "TCP initing.....", RED); //显示IP到屏幕上	
 	while(tcp_client_init()) 									//初始化tcp_client(创建tcp_client线程)
 	{
 		DEBUG("TCP Client failed!!\n"); //tcp客户端创建失败
 		delay_ms(1000);
 	}
-	DEBUG("TCP Client Success!\n"); 	//tcp客户端创建成功
+	DEBUG("TCP Client Init Success!\n"); 	//tcp客户端创建成功
 	while((res = tcp_server_init())!=0) 									//初始化tcp_client(创建tcp_client线程)
 	{
 		DEBUG("TCP Server failed:%d %d %d!!\n", res, OS_ERR_PRIO_INVALID, OS_ERR_TASK_CREATE_ISR); //tcp客户端创建失败
 		delay_ms(1000);
 	}
 	DEBUG("TCP Server Success!\n"); 	//tcp客户端创建成
-	POINT_COLOR = RED;
-	LCD_ShowString(20, 100, 160, 20, 16, "TCP init success"); //显示IP到屏幕上
+	DEBUG_LCD(20, 100, "TCP init success", RED); //显示IP到屏幕上
 	lwip_comm_dhcp_delete();//删除DHCP任务 
 }
 

@@ -1,26 +1,19 @@
 #include "sys.h"
 #include "delay.h"
 #include "usart.h"
-#include "idebug.h"
-#include "led.h"
-#include "key.h"
 #include "lwip_comm.h"
 #include "LAN8720.h"
 #include "usmart.h"
 #include "timer.h"
 #include "lcd.h"
 #include "sram.h"
-#include "malloc.h"
 #include "lwip_comm.h"
 #include "includes.h"
 #include "lwipopts.h"
-#include "task_priority.h"
 #include "dht11.h"
 #include "message_queue.h"
 #include "pwm.h"
 #include "lsens.h"
-#include "tcp_client.h"
-#include "instructions.h"
 #include "main.h"
 /*start任务*/
 OS_STK START_TASK_STK[START_STK_SIZE];
@@ -44,35 +37,32 @@ int main(void)
 	TIM14_PWM_Init(500-1,84-1);	//PF9 PWM,84M/84=1Mhz计数频率,重装载值500,所以PWM频率为 1M/500=2Khz. 
 	Lsens_Init();               //光敏电阻初始化
 	
-	POINT_COLOR = RED;
-	LCD_ShowString(50,20,200,20,16,"Welcome to IHome");
+	DEBUG_LCD(50,20,"Welcome to IHome", RED);
 	
-	LCD_ShowString(20,40,200,20,16,  "DHT11 initing....");
+	DEBUG_LCD(20,40,"DHT11 initing....", RED);
 	while(DHT11_Init())//温湿度传感器
 	{
-		LCD_ShowString(20,40,200,20,16,"DHT11 init error!");
+		DEBUG_LCD(20,40,"DHT11 init error!", RED);
 		delay_ms(250);
-		LCD_ShowString(20,40,200,20,16,"DHT11 initing....");
+		DEBUG_LCD(20,40, "DHT11 initing....", RED);
 		delay_ms(250);
 	}
-	LCD_ShowString(20,40,200,20,16,  "                 ");
+	DEBUG_LCD(20,40, "                 ", RED);
 	
 	mymem_init(SRAMIN);  	//初始化内部内存池
 	mymem_init(SRAMEX);  	//初始化外部内存池
 	mymem_init(SRAMCCM); 	//初始化CCM内存池
 
 	OSInit(); 					//UCOS初始化
-	POINT_COLOR = RED;
-	LCD_ShowString(20,60,200,20,16,  "Lwip Initing.....");
+	DEBUG_LCD(20,60,"Lwip Initing.....", RED);
 	while(lwip_comm_init()) 	//lwip初始化
 	{
-		LCD_ShowString(20,60,200,20,16,"Lwip Init failed!"); 	//lwip初始化失败
+		DEBUG_LCD(20,60,"Lwip Init failed!", RED); 	//lwip初始化失败
 		delay_ms(500);
 		LCD_Fill(20,60,230,150,WHITE);
 		delay_ms(500);
 	}
-	POINT_COLOR = GREEN;
-	LCD_ShowString(20,60,200,20,16,"Lwip Init Success!"); 		//lwip初始化成功
+	DEBUG_LCD(20,60,"Lwip Init Success!", GREEN); 		//lwip初始化成功
 	
 	OSTaskCreate(start_task,(void*)0,(OS_STK*)&START_TASK_STK[START_STK_SIZE-1],START_TASK_PRIO);
 	OSStart(); //开启UCOS
@@ -104,13 +94,5 @@ void start_task(void *pdata)
 	OS_EXIT_CRITICAL();  		//开中断
 }
 
-//显示地址等信息
-void display_task(void *pdata)
-{
-	while(1)
-	{ 
-		OSTimeDlyHMSM(0,0,0,500);
-	}
-}
 
 
