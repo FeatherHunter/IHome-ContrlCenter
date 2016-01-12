@@ -11,9 +11,25 @@
 #include "tcp_client.h"
 #include "tcp_server.h"
 
+#include "sram.h"   
+#include "sdio_sdcard.h"    
+#include "malloc.h" 
+#include "text.h"	
+#include "piclib.h"	
+#include "string.h"	
+#include "math.h"	
+#include "dcmi.h"	
+#include "ov2640.h"	
+#include "beep.h"	
+#include "timer.h"
+
+#include "camera.h"
+
 #define TCP_RX_BUFSIZE	    200	  //接收缓冲区长度
 #define REMOTE_PORT				  8080	//port: stm32 as client to connect server by ethernet
 #define TCP_SERVER_PORT			8080	//port: stm32 as server
+
+extern u8 sd_ok;
 
 extern const char master[ACCOUNT_MAX + 1];
 extern const char slave[ACCOUNT_MAX + 1];

@@ -592,14 +592,14 @@
               <FilePath>..\LWIP\lwip_app\lwip_comm\lwip_comm.c</FilePath>
             </File>
             <File>
-              <FileName>tcp_client.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LWIP\lwip_app\tcp_client\tcp_client.c</FilePath>
-            </File>
-            <File>
               <FileName>tcp_server.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\LWIP\lwip_app\tcp_server\tcp_server.c</FilePath>
+            </File>
+            <File>
+              <FileName>tcp_client.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LWIP\lwip_app\tcp_client\tcp_client.c</FilePath>
             </File>
           </Files>
         </Group>

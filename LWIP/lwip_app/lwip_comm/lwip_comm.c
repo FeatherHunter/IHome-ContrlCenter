@@ -189,7 +189,7 @@ void lwip_comm_dhcp_delete(void)
 //DHCP处理任务
 void lwip_dhcp_task(void *pdata)
 {
-	u8 res;
+	int res;
 	u8 ip_buf[20]; //存放ip用于显示
 	u32 ip=0,netmask=0,gw=0;
 	dhcp_start(&lwip_netif);//开启DHCP 

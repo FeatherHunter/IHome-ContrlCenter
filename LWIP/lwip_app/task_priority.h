@@ -60,16 +60,22 @@ extern OS_STK * TCP_SEND_TASK_STK;
 void tcp_send_task(void *arg);
 
 /*LED任务*/
-#define LED_TASK_PRIO		18
+#define LED_TASK_PRIO		17
 #define LED_STK_SIZE		128
 extern OS_STK	* LED_TASK_STK;
 void led_task(void *pdata);
 
 /*DHT11任务*/
-#define DHT11_TASK_PRIO		19
+#define DHT11_TASK_PRIO		18
 #define DHT11_STK_SIZE		128
 extern OS_STK	* DHT11_TASK_STK;
 void dht11_task(void *pdata);
+
+/*camera task*/
+#define CAMERA_TASK_PRIO		19
+#define CAMERA_STK_SIZE		256
+extern OS_STK	* CAMERA_TASK_STK;
+void camera_task(void *pdata);
 
 /*start任务*/
 #define START_TASK_PRIO		20

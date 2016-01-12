@@ -350,7 +350,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\FWLIB\STM32F4xx_StdPeriph_Driver\inc;..\USER;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\ETHERNET;..\HARDWARE\TIMER;..\HARDWARE\LED;..\HARDWARE\SRAM;..\FWLIB\STM32F4x7_ETH_Driver\inc;..\MALLOC;..\USMART;..\LWIP;..\LWIP\arch;..\LWIP\lwip_header;..\LWIP\app\TCP_Client;..\LWIP\lwip_app\lwip_comm;..\LWIP\lwip-1.4.1\src\include;..\LWIP\lwip-1.4.1\src\include\ipv4;..\LWIP\lwip-1.4.1\src\include\lwip;..\LWIP\lwip-1.4.1\src\include\netif;..\UCOSII\CONFIG;..\UCOSII\CORE;..\UCOSII\PORT;..\LWIP\lwip_app;..\LWIP\lwip_app\tcp_client;..\SOFTWARE;..\HARDWARE\DHT11;..\HARDWARE\LSENS;..\HARDWARE\ADC3;..\HARDWARE\PWM;..\LWIP\lwip_app\tcp_client_netconn;..\LWIP\lwip_app\tcp_server</IncludePath>
+              <IncludePath>..\CORE;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\FWLIB\STM32F4xx_StdPeriph_Driver\inc;..\USER;..\HARDWARE\KEY;..\HARDWARE\LCD;..\HARDWARE\ETHERNET;..\HARDWARE\TIMER;..\HARDWARE\LED;..\HARDWARE\SRAM;..\FWLIB\STM32F4x7_ETH_Driver\inc;..\MALLOC;..\USMART;..\LWIP;..\LWIP\arch;..\LWIP\lwip_header;..\LWIP\app\TCP_Client;..\LWIP\lwip_app\lwip_comm;..\LWIP\lwip-1.4.1\src\include;..\LWIP\lwip-1.4.1\src\include\ipv4;..\LWIP\lwip-1.4.1\src\include\lwip;..\LWIP\lwip-1.4.1\src\include\netif;..\UCOSII\CONFIG;..\UCOSII\CORE;..\UCOSII\PORT;..\LWIP\lwip_app;..\LWIP\lwip_app\tcp_client;..\SOFTWARE;..\HARDWARE\DHT11;..\HARDWARE\LSENS;..\HARDWARE\ADC3;..\HARDWARE\PWM;..\LWIP\lwip_app\tcp_client_netconn;..\LWIP\lwip_app\tcp_server;..\HARDWARE\BEEP;..\HARDWARE\DCMI;..\HARDWARE\OV2640;..\HARDWARE\SDIO;..\HARDWARE\W25QXX;..\TEXT;..\PICTURE;..\FATFS\src;..\FATFS\exfuns;..\HARDWARE\SPI</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -416,6 +416,11 @@
               <FileType>1</FileType>
               <FilePath>..\SOFTWARE\ihome_function.c</FilePath>
             </File>
+            <File>
+              <FileName>camera.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SOFTWARE\camera.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -470,6 +475,41 @@
               <FileName>pwm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\PWM\pwm.c</FilePath>
+            </File>
+            <File>
+              <FileName>beep.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\BEEP\beep.c</FilePath>
+            </File>
+            <File>
+              <FileName>dcmi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\DCMI\dcmi.c</FilePath>
+            </File>
+            <File>
+              <FileName>ov2640.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\OV2640\ov2640.c</FilePath>
+            </File>
+            <File>
+              <FileName>sccb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\OV2640\sccb.c</FilePath>
+            </File>
+            <File>
+              <FileName>w25qxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\W25QXX\w25qxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdio_sdcard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\SDIO\sdio_sdcard.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\SPI\spi.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -540,6 +580,26 @@
               <FileName>stm32f4xx_fsmc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FWLIB\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_fsmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FWLIB\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_dcmi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FWLIB\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dcmi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FWLIB\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FWLIB\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_sdio.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -900,6 +960,76 @@
               <FileName>readme.txt</FileName>
               <FileType>5</FileType>
               <FilePath>..\README\readme.txt</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>PICTURE</GroupName>
+          <Files>
+            <File>
+              <FileName>bmp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\PICTURE\bmp.c</FilePath>
+            </File>
+            <File>
+              <FileName>gif.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\PICTURE\gif.c</FilePath>
+            </File>
+            <File>
+              <FileName>piclib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\PICTURE\piclib.c</FilePath>
+            </File>
+            <File>
+              <FileName>tjpgd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\PICTURE\tjpgd.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>FATFS</GroupName>
+          <Files>
+            <File>
+              <FileName>diskio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FATFS\src\diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FATFS\src\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>exfuns.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FATFS\exfuns\exfuns.c</FilePath>
+            </File>
+            <File>
+              <FileName>fattester.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FATFS\exfuns\fattester.c</FilePath>
+            </File>
+            <File>
+              <FileName>mycc936.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FATFS\exfuns\mycc936.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>TEXT</GroupName>
+          <Files>
+            <File>
+              <FileName>fontupd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TEXT\fontupd.c</FilePath>
+            </File>
+            <File>
+              <FileName>text.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TEXT\text.c</FilePath>
             </File>
           </Files>
         </Group>

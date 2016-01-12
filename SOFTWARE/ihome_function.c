@@ -1,7 +1,4 @@
-#include "main.h"
 #include "ihome_function.h"
-#include "lsens.h"
-
 /**
  * @copyright 王辰浩(2015~2025) QQ：975559549
  * @Author Feather @version 2.0 @date 2016.1.4
@@ -11,17 +8,21 @@
  *		1.void led_task(void *pdata); //lamp task
  *		2.void dht11_task(void *pdata); //dht11 task about temp and humi
  */ 
+#include "main.h"
+#include "lsens.h"
+#include "camera.h"
  
 /*开启智能家居模式的标志
  *START:已经开启
  *STOP:关闭智能家居模式*/
 int ihome_start_flag = IHome_STOP;
  
- 
 /*LED任务堆栈*/
 OS_STK	* LED_TASK_STK;
 /*DHT11任务堆栈*/
 OS_STK	* DHT11_TASK_STK;
+/*CAMERA Task STK*/
+OS_STK  * CAMERA_TASK_STK;
 
 /*led消息队列*/
 void *led_q[MSGSIZE];
@@ -30,6 +31,71 @@ OS_EVENT * led_event;
 /*dht11 消息队列*/
 void *dht11_q[DHT11SIZE];
 OS_EVENT * dht11_event;
+ 
+
+/**
+ * @Function void camera_task(void *arg)
+ * @description 不断拍摄照片保存到SD上
+ * @Input void * void参数
+ * @Return NULL
+ */
+void camera_task(void *arg)
+{
+	  u8 res;
+	  DEBUG("camera task\r\n");
+	  My_DCMI_Init();			//DCMI配置
+	  DCMI_DMA_Init((u32)&LCD->LCD_RAM,0,1,DMA_MemoryDataSize_HalfWord,DMA_MemoryInc_Disable);//DCMI DMA配置  
+	  //OV2640_ImageWin_Set((1600-lcddev.width)/2,(1200-lcddev.height)/2,lcddev.width,lcddev.height);//1:1真实尺寸
+		//OV2640_OutSize_Set(lcddev.width,lcddev.height); 
+		OV2640_ImageSize_Set(1600, 1200);
+		//OV2640_ImageWin_Set(0,0,1600,1200);	//全尺寸缩放 
+		//OV2640_OutSize_Set(1600, 1200);
+	  //DCMI_Start(); 			//启动显示功能
+	  while(1)
+	  {
+			  //DEBUG("camera task\r\n");
+		    //等待接收发来的摄像头ID
+		    //while(camera_server_isready == 0)//等到和请求方建立传送视频的链接
+		    //{
+			  //    OSTimeDlyHMSM(0,0,1,0);  //延时1s
+		    //}
+		    /*1:1 real size*/
+		    //OV2640_ImageWin_Set((1600-lcddev.width)/2,(1200-lcddev.height)/2,lcddev.width,lcddev.height);//1:1真实尺寸
+		    //OV2640_OutSize_Set(lcddev.width,lcddev.height); 
+		    if(sd_ok)
+		    {
+					//DCMI_Stop(); //停止显示到LCD 
+			    sw_sdcard_mode();	//切换为SD卡模式
+			    /*BMP拍照*/
+		      //camera_new_pathname(pname,0);//得到文件名	
+		      //res=bmp_encode(pname,0,0,lcddev.width,lcddev.height,0);	
+			    /*jpg拍照*/
+			    camera_new_pathname(pname,1);//得到文件名	
+			    res=ov2640_jpg_photo(pname);
+					//OV2640_ImageWin_Set((1600-lcddev.width)/2,(1200-lcddev.height)/2,lcddev.width,lcddev.height);//1:1真实尺寸
+					//OV2640_OutSize_Set(lcddev.width,lcddev.height);
+			    sw_ov2640_mode();	//切换为OV2640模式
+			    if(res)//拍照有误
+			    {
+					    //Show_Str(30,130,240,16,"写入文件错误!",16,0);		 
+			    }else 
+			    {
+					    //Show_Str(30,130,240,16,"拍照成功!",16,0);
+					    //Show_Str(30,150,240,16,"保存为:",16,0);
+					    //Show_Str(30+42,150,240,16,pname,16,0);		    
+					    //BEEP=1;	//蜂鸣器短叫，提示拍照完成
+			    }
+					//DCMI_Start(); 			//启动显示功能
+		    }
+		    else //提示SD卡错误
+		    {					    
+			    //Show_Str(30,130,240,16,"SD卡错误!",16,0);
+			    //Show_Str(30,150,240,16,"拍照功能不可用!",16,0);			    
+		    } 
+		    //BEEP=0;			//关闭蜂鸣器 
+		    OSTimeDlyHMSM(0,0,0,1);  //延时1s
+	  }
+}
  
 /**
  * @Function void led_task(void *pdata);
@@ -422,8 +488,6 @@ void dht11_task(void *pdata)
 				}
 			}//end of strcmp(msg, "HUMI") == 0
 		}//end of server
-		
-		
 		
 		myfree(SRAMEX, msg);
 		myfree(SRAMEX, msg1);
