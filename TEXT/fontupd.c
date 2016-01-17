@@ -222,32 +222,3 @@ u8 font_init(void)
 	if(ftinfo.fontok!=0XAA)return 1;
 	return 0;		    
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

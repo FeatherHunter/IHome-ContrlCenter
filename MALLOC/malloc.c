@@ -173,15 +173,3 @@ void *myrealloc(u8 memx,void *ptr,u32 size)
         return (void*)((u32)mallco_dev.membase[memx]+offset);  				//返回新内存首地址
     }  
 }
-
-
-
-
-
-
-
-
-
-
-
-

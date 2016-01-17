@@ -211,12 +211,3 @@ void fsmc_sram_test(u16 x, u16 y)
 	}
 }
  
-
-
-
-
-
-
-
-
-

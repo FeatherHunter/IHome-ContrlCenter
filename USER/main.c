@@ -31,9 +31,6 @@ void start_task(void *pdata);
 const char master[ACCOUNT_MAX + 1] = "975559549";
 const char slave[ACCOUNT_MAX + 1] = "975559549h";
 char password[ACCOUNT_MAX + 1] = "545538516";
-
-#if 1
-
 int main(void)
 {
 	u8 res;							 		   				 
@@ -135,10 +132,4 @@ void start_task(void *pdata)
 	OSTaskSuspend(OS_PRIO_SELF); //挂起start_task任务
 	OS_EXIT_CRITICAL();  		//开中断
 }
-
-
-
-#endif
-
-
 

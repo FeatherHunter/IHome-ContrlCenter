@@ -414,19 +414,3 @@ u8 OV2640_ImageSize_Set(u16 width,u16 height)
 	return 0;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
