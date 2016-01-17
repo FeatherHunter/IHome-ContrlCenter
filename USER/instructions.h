@@ -6,23 +6,30 @@
 #define COMMAND_MANAGE 1
 #define COMMAND_CONTRL 2
 #define COMMAND_RESULT 3
-#define MAN_LOGIN 11
-#define CTL_LAMP  21
-#define CTL_GET   22
-#define CTL_IHome 23
-#define RES_LOGIN 32
-#define RES_LAMP  33
-#define RES_TEMP  34
-#define RES_HUMI  35
-#define RES_IHome 36
+#define COMMAND_VIDEO  4
+#define MAN_LOGIN     11
+#define CTL_LAMP      21
+#define CTL_GET       22
+#define CTL_IHome     23
+#define CTL_VIDEO     24
+#define RES_LOGIN     32
+#define RES_LAMP      33
+#define RES_TEMP      34
+#define RES_HUMI      35
+#define RES_IHome     36
+#define RES_VIDEO     37
+#define VIDEO_START   41
+#define VIDEO_STOP    42
 #define LOGIN_SUCCESS 1
 #define LOGIN_FAILED  2
-#define LAMP_ON  1
-#define LAMP_OFF 2
-#define IHome_START 1
-#define IHome_STOP  2
+#define LAMP_ON       1
+#define LAMP_OFF      2
+#define IHome_START   1
+#define IHome_STOP    2
+#define VIDEO_OK			1
+#define VIDEO_ERROR   2
  
-#define COMMAND_END 30
+#define COMMAND_END       30
 #define COMMAND_SEPERATOR 31
 
 #endif

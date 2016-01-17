@@ -104,3 +104,8 @@
 ..\OBJ\ihome_function.o: ..\SOFTWARE\camera.h
 ..\OBJ\ihome_function.o: ..\HARDWARE\LSENS\lsens.h
 ..\OBJ\ihome_function.o: ..\HARDWARE\ADC3\adc3.h
+..\OBJ\ihome_function.o: ..\LWIP\lwip-1.4.1\src\include\lwip/lwip_sys.h
+..\OBJ\ihome_function.o: ..\LWIP\arch/sys_arch.h
+..\OBJ\ihome_function.o: ..\LWIP\lwip-1.4.1\src\include\lwip/api.h
+..\OBJ\ihome_function.o: D:\Keil_ARM\ARM\ARMCC\bin\..\include\stddef.h
+..\OBJ\ihome_function.o: ..\LWIP\lwip-1.4.1\src\include\lwip/netbuf.h

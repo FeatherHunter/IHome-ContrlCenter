@@ -28,6 +28,7 @@
 #define TCP_RX_BUFSIZE	    200	  //接收缓冲区长度
 #define REMOTE_PORT				  8080	//port: stm32 as client to connect server by ethernet
 #define TCP_SERVER_PORT			8080	//port: stm32 as server
+#define VIDEO_SERVER_PORT		8081	//port: video server
 
 extern u8 sd_ok;
 

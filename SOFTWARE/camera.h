@@ -36,6 +36,7 @@ void camera_Init(void);                       //初始化
 void sw_ov2640_mode(void);                    //切换为OV2640模式（GPIOC8/9/11切换为 DCMI接口）
 void sw_sdcard_mode(void);                    //切换为SD卡模式（GPIOC8/9/11切换为 SDIO接口）
 void jpeg_data_process(void); 							  //处理JPEG数据
+u8 ov2640_jpg_send(void);
 u8 ov2640_jpg_photo(u8 *pname);  						  //OV2640拍照jpg图片
 void jpeg_dcmi_rx_callback(void); 						//jpeg数据接收回调函数
 void camera_new_pathname(u8 *pname,u8 mode);  //文件名自增（避免覆盖）

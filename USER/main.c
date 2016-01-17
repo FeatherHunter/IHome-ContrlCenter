@@ -92,7 +92,7 @@ int main(void)
 	camera_Init();      //Init camera, mode = JPEG	
 
 	OSInit(); 					//UCOS初始化
-#if 0
+	
 	DEBUG_LCD(20,60,"Lwip Initing.....", RED);
 	while(lwip_comm_init()) 	//lwip初始化
 	{
@@ -102,7 +102,6 @@ int main(void)
 		delay_ms(500);
 	}
 	DEBUG_LCD(20,60,"Lwip Init Success!", GREEN); 		//lwip初始化成功
-#endif
 	OSTaskCreate(start_task,(void*)0,(OS_STK*)&START_TASK_STK[START_STK_SIZE-1],START_TASK_PRIO);
 	OSStart(); //开启UCOS
 }
@@ -118,18 +117,19 @@ void start_task(void *pdata)
 	
 	dht11_event       = OSQCreate(&dht11_q[0]     , DHT11SIZE);
 	led_event         = OSQCreate(&led_q[0]       , MSGSIZE);
+	camera_event      = OSQCreate(&camera_q[0]    , CAMERASIZE);
 	tcp_send_event    = OSQCreate(&tcp_send_q[0]  , SENDSIZE);   //创建处理消息队列
   tcp_handle_event  = OSQCreate(&tcp_handle_q[0], HANDLESIZE); //创建发送消息队列
 	
 #if LWIP_DHCP
-	//lwip_comm_dhcp_creat(); //创建DHCP任务
+	lwip_comm_dhcp_creat(); //创建DHCP任务
 #endif
 	LED_TASK_STK    = mymalloc(SRAMEX, LED_STK_SIZE*sizeof(OS_STK));
 	DHT11_TASK_STK  = mymalloc(SRAMEX, DHT11_STK_SIZE*sizeof(OS_STK));
 	CAMERA_TASK_STK = mymalloc(SRAMEX, CAMERA_STK_SIZE*sizeof(OS_STK));
 	
-	//OSTaskCreate(led_task,(void*)0,(OS_STK*)&LED_TASK_STK[LED_STK_SIZE-1],LED_TASK_PRIO);//创建LED任务
- 	//OSTaskCreate(dht11_task,(void*)0,(OS_STK*)&DHT11_TASK_STK[DHT11_STK_SIZE-1],DHT11_TASK_PRIO);//创建DHT11任务
+	OSTaskCreate(led_task,(void*)0,(OS_STK*)&LED_TASK_STK[LED_STK_SIZE-1],LED_TASK_PRIO);//创建LED任务
+ 	OSTaskCreate(dht11_task,(void*)0,(OS_STK*)&DHT11_TASK_STK[DHT11_STK_SIZE-1],DHT11_TASK_PRIO);//创建DHT11任务
 	OSTaskCreate(camera_task,(void*)0,(OS_STK*)&CAMERA_TASK_STK[CAMERA_STK_SIZE-1],CAMERA_TASK_PRIO);//创建CAMERA任务
 	
 	OSTaskSuspend(OS_PRIO_SELF); //挂起start_task任务

@@ -59,6 +59,12 @@ void tcp_handle_task(void *arg);
 extern OS_STK * TCP_SEND_TASK_STK;	
 void tcp_send_task(void *arg);
 
+/*video tcp server*/
+#define VIDEOSERVER_PRIO		7
+#define VIDEOSERVER_STK_SIZE	300
+extern OS_STK * VIDEOSERVER_TASK_STK;
+void video_server_task(void *arg);
+
 /*LEDÈÎÎñ*/
 #define LED_TASK_PRIO		17
 #define LED_STK_SIZE		128

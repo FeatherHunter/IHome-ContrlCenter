@@ -511,6 +511,64 @@ void tcp_handle_task(void *arg)
 						}
 					}//end of ctl_lamp
 				
+					else if(subtype == CTL_VIDEO)
+					{
+						/*get operation for camera, start or stop*/
+						if(recv_msg[i+1] == COMMAND_SEPERATOR)
+						{
+							res = recv_msg[i];
+						}
+						else
+						{
+							/*当前指令无效,跳转到下一个指令*/
+							while((recv_msg[i] != '\0') && (recv_msg[i] != COMMAND_END)&&(i<TCP_RX_BUFSIZE))//msg[i]=END
+							{
+									i++;
+							}
+							i++;
+							continue;
+						}
+						i+=2;
+						/*get camera's id*/
+						for(j = 0; (recv_msg[i]!='\0')&&(i<TCP_RX_BUFSIZE)&&(recv_msg[i]!=COMMAND_SEPERATOR)&&(j <= ACCOUNT_MAX); i++, j++)
+						{
+							account[j] = recv_msg[i]; //save id into account
+						}
+						i++;
+						account[j] = '\0';
+						
+						/*表示是收到服务器控制信息(stm32 as client)*/
+						msg_buf = mymalloc(SRAMEX, 7);
+						sprintf((char *)msg_buf, "client");
+						if(OSQPost(camera_event, msg_buf) != OS_ERR_NONE)//为客户端信息
+						{
+							 DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+						}	
+						/*send statr or stop to CAMERA TSAK */
+						msg_buf = mymalloc(SRAMEX, 10);//外部内存分配空间
+						if(res == VIDEO_START)
+						{
+							DEBUG("VIDEO_START\n");
+							sprintf((char *)msg_buf, "START");
+						}
+						else if(res == VIDEO_STOP)
+						{
+							DEBUG("VIDEO_STOP\n");
+							sprintf((char *)msg_buf, "STOP");
+						}
+						if(OSQPost(camera_event,msg_buf) != OS_ERR_NONE)
+						{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+						}
+						/*Send camera's ID to Camera task*/
+						msg_buf = mymalloc(SRAMEX, ACCOUNT_MAX + 1);//外部内存分配空间
+						sprintf((char *)msg_buf, (char *)account);
+						if(OSQPost(camera_event,msg_buf) != OS_ERR_NONE)
+						{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+						}
+					}//end of CTL_VIDEO
+				
 				}//end of command contrl
 			}//end of while(msg)
 			
@@ -803,6 +861,59 @@ void tcp_handle_task(void *arg)
 							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
 						}
 					}//end of ctl_lamp
+					else if(subtype == CTL_VIDEO)
+					{
+						/*get operation for camera, start or stop*/
+						if(recv_msg[i+1] == COMMAND_SEPERATOR)
+						{
+							res = recv_msg[i];
+						}
+						else
+						{
+							/*当前指令无效,跳转到下一个指令*/
+							while((recv_msg[i] != '\0') && (recv_msg[i] != COMMAND_END)&&(i<TCP_RX_BUFSIZE))//msg[i]=END
+							{
+									i++;
+							}
+							i++;
+							continue;
+						}
+						i+=2;
+						/*get camera's id*/
+						for(j = 0; (recv_msg[i]!='\0')&&(i<TCP_RX_BUFSIZE)&&(recv_msg[i]!=COMMAND_SEPERATOR)&&(j <= ACCOUNT_MAX); i++, j++)
+						{
+							account[j] = recv_msg[i]; //save id into account
+						}
+						i++;
+						account[j] = '\0';
+						
+						/*send statr or stop to CAMERA TSAK */
+						msg_buf = mymalloc(SRAMEX, 10);//外部内存分配空间
+						if(res == VIDEO_START)
+						{
+							DEBUG("VIDEO_START\n");
+							camera_start = VIDEO_START;
+						}
+						else if(res == VIDEO_STOP)
+						{
+							DEBUG("VIDEO_STOP\n");
+							camera_start = VIDEO_STOP;
+						}
+						/*表示是收到服务器控制信息(stm32 as client)*/
+						msg_buf = mymalloc(SRAMEX, 7);
+						sprintf((char *)msg_buf, "server");
+						if(OSQPost(camera_event, msg_buf) != OS_ERR_NONE)//为客户端信息
+						{
+							 DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+						}	
+						/*Send camera's ID to Camera task*/
+						msg_buf = mymalloc(SRAMEX, ACCOUNT_MAX + 1);//外部内存分配空间
+						sprintf((char *)msg_buf, (char *)account);
+						if(OSQPost(camera_event,msg_buf) != OS_ERR_NONE)
+						{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+						}
+					}//end of CTL_VIDEO
 				
 				}//end of command contrl
 			}//end of while(msg)

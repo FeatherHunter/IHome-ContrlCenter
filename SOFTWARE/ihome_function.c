@@ -11,11 +11,22 @@
 #include "main.h"
 #include "lsens.h"
 #include "camera.h"
+
+#include "lwip/opt.h"
+#include "lwip_comm.h"
+#include "lwip/lwip_sys.h"
+#include "lwip/api.h"
+#include "includes.h"
  
 /*开启智能家居模式的标志
  *START:已经开启
  *STOP:关闭智能家居模式*/
+
+#define CAMERA_ID "20000"
+ 
 int ihome_start_flag = IHome_STOP;
+
+int camera_start = VIDEO_STOP;
  
 /*LED任务堆栈*/
 OS_STK	* LED_TASK_STK;
@@ -31,6 +42,10 @@ OS_EVENT * led_event;
 /*dht11 消息队列*/
 void *dht11_q[DHT11SIZE];
 OS_EVENT * dht11_event;
+
+/*camera's message queue*/
+void *camera_q[CAMERASIZE];
+OS_EVENT * camera_event;
  
 
 /**
@@ -41,59 +56,240 @@ OS_EVENT * dht11_event;
  */
 void camera_task(void *arg)
 {
-	  u8 res;
+	  u8 res = 0;
+		u8 isServer = 1;
+	  INT8U err;
+		u8 * send_buf;
+		u8* pbuf;
+		u16 i;
+		unsigned int len;
+	  unsigned int count;
+		unsigned int jpegtimes;
+		unsigned int jpegremainder;
+		char * msg_auth;
+	  char * msg_camera;
 	  DEBUG("camera task\r\n");
 	  My_DCMI_Init();			//DCMI配置
 	  DCMI_DMA_Init((u32)&LCD->LCD_RAM,0,1,DMA_MemoryDataSize_HalfWord,DMA_MemoryInc_Disable);//DCMI DMA配置  
 	  //OV2640_ImageWin_Set((1600-lcddev.width)/2,(1200-lcddev.height)/2,lcddev.width,lcddev.height);//1:1真实尺寸
 		//OV2640_OutSize_Set(lcddev.width,lcddev.height); 
-		OV2640_ImageSize_Set(1600, 1200);
-		//OV2640_ImageWin_Set(0,0,1600,1200);	//全尺寸缩放 
-		//OV2640_OutSize_Set(1600, 1200);
-	  //DCMI_Start(); 			//启动显示功能
+		ov2640_mode=1;
+		sw_ov2640_mode();														//切换为OV2640模式
+		dcmi_rx_callback=jpeg_dcmi_rx_callback;			//回调函数
+		DCMI_DMA_Init((u32)jpeg_buf0,(u32)jpeg_buf1,jpeg_dma_bufsize,DMA_MemoryDataSize_Word,DMA_MemoryInc_Enable);//DCMI DMA配置(双缓冲模式)
+		OV2640_JPEG_Mode();												//切换为JPEG模式 
+		OV2640_ImageWin_Set(0,0, 1600, 1200);			 
+		OV2640_OutSize_Set(1600, 1200);						//拍照尺寸为1600*1200
 	  while(1)
 	  {
-			  //DEBUG("camera task\r\n");
-		    //等待接收发来的摄像头ID
-		    //while(camera_server_isready == 0)//等到和请求方建立传送视频的链接
-		    //{
-			  //    OSTimeDlyHMSM(0,0,1,0);  //延时1s
-		    //}
-		    /*1:1 real size*/
-		    //OV2640_ImageWin_Set((1600-lcddev.width)/2,(1200-lcddev.height)/2,lcddev.width,lcddev.height);//1:1真实尺寸
-		    //OV2640_OutSize_Set(lcddev.width,lcddev.height); 
-		    if(sd_ok)
-		    {
-					//DCMI_Stop(); //停止显示到LCD 
-			    sw_sdcard_mode();	//切换为SD卡模式
-			    /*BMP拍照*/
-		      //camera_new_pathname(pname,0);//得到文件名	
-		      //res=bmp_encode(pname,0,0,lcddev.width,lcddev.height,0);	
-			    /*jpg拍照*/
-			    camera_new_pathname(pname,1);//得到文件名	
-			    res=ov2640_jpg_photo(pname);
-					//OV2640_ImageWin_Set((1600-lcddev.width)/2,(1200-lcddev.height)/2,lcddev.width,lcddev.height);//1:1真实尺寸
-					//OV2640_OutSize_Set(lcddev.width,lcddev.height);
-			    sw_ov2640_mode();	//切换为OV2640模式
-			    if(res)//拍照有误
-			    {
-					    //Show_Str(30,130,240,16,"写入文件错误!",16,0);		 
-			    }else 
-			    {
-					    //Show_Str(30,130,240,16,"拍照成功!",16,0);
-					    //Show_Str(30,150,240,16,"保存为:",16,0);
-					    //Show_Str(30+42,150,240,16,pname,16,0);		    
-					    //BEEP=1;	//蜂鸣器短叫，提示拍照完成
-			    }
-					//DCMI_Start(); 			//启动显示功能
-		    }
-		    else //提示SD卡错误
-		    {					    
-			    //Show_Str(30,130,240,16,"SD卡错误!",16,0);
-			    //Show_Str(30,150,240,16,"拍照功能不可用!",16,0);			    
-		    } 
-		    //BEEP=0;			//关闭蜂鸣器 
-		    OSTimeDlyHMSM(0,0,0,1);  //延时1s
+				while(camera_start == VIDEO_STOP)
+				{
+					OSTimeDlyHMSM(0,0,2,0);  //延时2s
+				}
+				/*get video's id*/
+			  msg_auth = (char *)OSQPend (camera_event,
+                0,  //wait 500ms
+                &err);
+				if(err != OS_ERR_NONE)
+				{
+						DEBUG("Camera TASK OSQPend error %s %d\n", __FILE__, __LINE__);
+						continue; //没有接收到ID
+				}
+				if(strcmp(msg_auth, "server") == 0)
+				{
+					isServer = 1;
+				}
+				else if(strcmp(msg_auth, "client") == 0)
+				{
+					isServer = 0;
+				}
+				else continue;//not serverconn or client
+				msg_camera = (char *)OSQPend (camera_event,
+                500,  //wait 500ms
+                &err);
+				if(err != OS_ERR_NONE)
+				{
+					DEBUG("Camera TASK OSQPend error %s %d\n", __FILE__, __LINE__);
+					continue; //没有接收到指令
+				}
+				
+				if(isServer == 1)
+				{
+					/*send msg as server*/
+					send_buf = mymalloc(SRAMEX, 7);
+					sprintf((char *)send_buf, "server");
+					if(OSQPost(tcp_send_event,send_buf) != OS_ERR_NONE)//为客户端信息
+					{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}		
+				}
+				else
+				{
+					/*send msg as server*/
+					send_buf = mymalloc(SRAMEX, 7);
+					sprintf((char *)send_buf, "client");
+					if(OSQPost(tcp_send_event,send_buf) != OS_ERR_NONE)//为客户端信息
+					{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}		
+				}
+				
+				if(strcmp(msg_camera, CAMERA_ID) != 0)//make sure id's right
+				{
+					/*VIDEO_ERROR*/
+					send_buf = mymalloc(SRAMEX, 41); //32(account))+8+1 状态指令最高上限
+					sprintf((char *)send_buf, "%c%c%s%c%c%c%c%c%c",
+																		COMMAND_RESULT,COMMAND_SEPERATOR,
+																		slave,COMMAND_SEPERATOR,
+																		RES_VIDEO,COMMAND_SEPERATOR,
+																		VIDEO_ERROR, COMMAND_SEPERATOR,COMMAND_END);
+					if(OSQPost(tcp_send_event,send_buf) != OS_ERR_NONE)
+					{
+						DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}
+					continue;
+				}
+				if(isServer == 1)
+				{
+					/*VIDEO_send start*/
+					send_buf = mymalloc(SRAMEX, 72); //64+8 状态指令最高上限
+					sprintf((char *)send_buf, "%c%c""%s%c""%s%c""%c%c%c",
+																		COMMAND_VIDEO,COMMAND_SEPERATOR,
+																		slave,COMMAND_SEPERATOR,
+																		CAMERA_ID,COMMAND_SEPERATOR,
+																		VIDEO_START, COMMAND_SEPERATOR,COMMAND_END);
+					err = netconn_write(video_server ,send_buf,strlen((char*)send_buf),NETCONN_COPY); //发送给用户开始传输的信息
+					if(err != ERR_OK)
+					{
+							DEBUG("发送失败\r\n");
+							video_isConnected = 0;
+					}
+					myfree(SRAMEX, send_buf);
+				}
+				
+				if(camera_start == VIDEO_START)
+				//while(camera_start == VIDEO_START)//start video
+				{
+					DCMI_Start(); 										//启动传输 
+					while(jpeg_data_ok!=1);						//等待第一帧图片采集完
+					jpeg_data_ok=2;										//忽略本帧图片,启动下一帧采集
+					while(jpeg_data_ok!=1);						//等待第二帧图片采集完
+					jpeg_data_ok=2;										//忽略本帧图片,启动下一帧采集
+					while(jpeg_data_ok!=1);						//等待第三帧图片采集完,第三帧,才保存到SD卡去.
+					DCMI_Stop(); 											//停止DMA搬运
+					
+					/*get a jpeg photo*/
+					pbuf=(u8*)jpeg_data_buf;
+					for(i=0;i<jpeg_data_len*4;i++)//查找0XFF,0XD8
+					{
+						if((pbuf[i]==0XFF)&&(pbuf[i+1]==0XD8))break;
+					}
+					if(i==jpeg_data_len*4)res=0XFD;//没找到0XFF,0XD8
+					else//找到了
+					{
+						pbuf+=i;//偏移到0XFF,0XD8处
+						jpegtimes     = (jpeg_data_len*4-i) / 1000; //将整个文件分解成小文件
+						jpegremainder = (jpeg_data_len*4-i) % 1000; //余下来的也要发送出去
+						if(isServer == 1)//as server sendto user
+						{
+							/*发送状态信息*/
+							send_buf = mymalloc(SRAMEX, 4096); //4096
+							sprintf((char *)send_buf, "%c%c%s%c""%s%c",
+																		COMMAND_VIDEO,COMMAND_SEPERATOR,slave, COMMAND_SEPERATOR,
+																		CAMERA_ID,COMMAND_SEPERATOR);
+							len = strlen(send_buf);
+							DEBUG("camera led:%d\r\n", len);
+							for(count = 0; count < jpegtimes; count++)
+							{
+								DEBUG("camera task send to user：%d\r\n", count);
+								memcpy(send_buf + len, pbuf, 1000); //pbuf开始的4000字节存入send_buf 头信息之后
+								*(send_buf + len + 1000) = COMMAND_END;
+								*(send_buf + len + 1001) = '\0';
+								err = netconn_write(video_server ,send_buf + len, len + 1002,NETCONN_COPY); //packet 4000byte into a packet
+								pbuf += 1000;
+								if(err != ERR_OK)
+								{
+									DEBUG("发送失败\r\n");
+									video_isConnected = 0;
+								}
+								OSTimeDlyHMSM(0,0,0,10);  //延时10ms
+							}
+							DEBUG("camera task send to user：remainder\r\n");
+							/*send remainder*/
+							memcpy(send_buf + len, pbuf, jpegremainder); //pbuf开始的4000字节存入send_buf 头信息之后
+							*(send_buf + len + jpegremainder) = COMMAND_END;
+							*(send_buf + len + jpegremainder + 1) = '\0';
+							err = netconn_write(video_server ,send_buf + len, len + jpegremainder + 2,NETCONN_COPY);
+							if(err != ERR_OK)
+							{
+								DEBUG("发送失败\r\n");
+								video_isConnected = 0;
+							}
+							//camera_start = VIDEO_STOP;
+							OSTimeDlyHMSM(0,0,0,10);  //延时10ms
+							myfree(SRAMEX, send_buf);
+						}
+						else//as client sendto to server
+						{
+							 
+							
+							
+						}
+						//pbuf len:jpeg_data_len*4-i
+						//res=f_write(f_jpg,pbuf,jpeg_data_len*4-i,&bwr); //save data into jpeg_buf0.file
+						//if(bwr!=(jpeg_data_len*4-i))res=0XFE; 
+					}
+					jpeg_data_len=0;
+					sw_ov2640_mode();		//切换为OV2640模式
+
+					if(res)
+					{
+						DEBUG("ov2640_jpg_send, error:%x \r\n", res);
+					}
+					else
+					{
+						DEBUG("ov2640_jpg_send, success:%x \r\n", res);
+					}
+					OSTimeDlyHMSM(0,0,0,1);  //延时1ms
+				}//end of while(camera_start == VIDEO_START)
+				
+				
+				
+				if(isServer == 1)
+				{
+					/*send msg as server*/
+					send_buf = mymalloc(SRAMEX, 7);
+					sprintf((char *)send_buf, "server");
+					if(OSQPost(tcp_send_event,send_buf) != OS_ERR_NONE)//为客户端信息
+					{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}	
+				}
+				else
+				{
+					/*send msg as server*/
+					send_buf = mymalloc(SRAMEX, 7);
+					sprintf((char *)send_buf, "client");
+					if(OSQPost(tcp_send_event,send_buf) != OS_ERR_NONE)//为客户端信息
+					{
+							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+					}		
+				}
+				/*VIDEO_send stop*/
+				send_buf = mymalloc(SRAMEX, 72); //64+8 状态指令最高上限
+				sprintf((char *)send_buf, "%c%c""%s%c""%s%c""%c%c%c",
+																		COMMAND_VIDEO,COMMAND_SEPERATOR,
+																		slave,COMMAND_SEPERATOR,
+																		CAMERA_ID,COMMAND_SEPERATOR,
+																		VIDEO_STOP, COMMAND_SEPERATOR,COMMAND_END);
+				if(OSQPost(tcp_send_event,send_buf) != OS_ERR_NONE)
+				{
+						DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+				}
+				DEBUG("video send STOP to user!!!!!!!!!\r\n");
+				
+				camera_start = VIDEO_STOP;
+				OSTimeDlyHMSM(0,0,0,1);  //延时1ms
 	  }
 }
  

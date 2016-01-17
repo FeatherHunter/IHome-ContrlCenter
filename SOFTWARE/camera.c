@@ -204,7 +204,7 @@ void camera_new_pathname(u8 *pname,u8 mode)
 		else//找到了
 		{
 			pbuf+=i;//偏移到0XFF,0XD8处
-			res=f_write(f_jpg,pbuf,jpeg_data_len*4-i,&bwr);
+			res=f_write(f_jpg,pbuf,jpeg_data_len*4-i,&bwr); //save data into jpeg_buf0.file
 			if(bwr!=(jpeg_data_len*4-i))res=0XFE; 
 		}
 	}
@@ -219,22 +219,22 @@ void camera_new_pathname(u8 *pname,u8 mode)
 }
 
 /**
- * @Function u8 ov2640_jpg_photo(u8 *pname)
+ * @Function u8 ov2640_jpg_send()
  * @description OV2640拍照jpg图片
  * @Input:  u8 *pname;  file path name
  * @Return  0    : success
  *          other: failed
  */
- u8 ov2640_jpg_send(u8 *pname)
+u8 ov2640_jpg_send()
 {
-	FIL* f_jpg;
 	u8 res=0;
 	u32 bwr;
 	u16 i;
-	u8* pbuf;
-
-	ov2640_mode=1; //JPEG模式
+	u8* pbuf;							
+	ov2640_mode=1;
 	sw_ov2640_mode();														//切换为OV2640模式
+	dcmi_rx_callback=jpeg_dcmi_rx_callback;			//回调函数
+	DCMI_DMA_Init((u32)jpeg_buf0,(u32)jpeg_buf1,jpeg_dma_bufsize,DMA_MemoryDataSize_Word,DMA_MemoryInc_Enable);//DCMI DMA配置(双缓冲模式)
 	OV2640_JPEG_Mode();												//切换为JPEG模式 
  	OV2640_ImageWin_Set(0,0, 1600, 1200);			 
 	OV2640_OutSize_Set(1600, 1200);						//拍照尺寸为1600*1200
@@ -246,25 +246,26 @@ void camera_new_pathname(u8 *pname,u8 mode)
 	while(jpeg_data_ok!=1);						//等待第三帧图片采集完,第三帧,才保存到SD卡去.
 	DCMI_Stop(); 											//停止DMA搬运
 
-	printf("jpeg data size:%d\r\n",jpeg_data_len*4);//串口打印JPEG文件大小
-	pbuf=(u8*)jpeg_data_buf;
-	for(i=0;i<jpeg_data_len*4;i++)//查找0XFF,0XD8
-	{
+	/*get a jpeg photo*/
+		pbuf=(u8*)jpeg_data_buf;
+		for(i=0;i<jpeg_data_len*4;i++)//查找0XFF,0XD8
+		{
 			if((pbuf[i]==0XFF)&&(pbuf[i+1]==0XD8))break;
-	}
-	if(i==jpeg_data_len*4)res=0XFD;//没找到0XFF,0XD8
-	else//找到了
-	{
-		pbuf+=i;//偏移到0XFF,0XD8处
-		res=f_write(f_jpg,pbuf,jpeg_data_len*4-i,&bwr);
-		if(bwr!=(jpeg_data_len*4-i))res=0XFE; 
-	}
+		}
+		if(i==jpeg_data_len*4)res=0XFD;//没找到0XFF,0XD8
+		else//找到了
+		{
+			pbuf+=i;//偏移到0XFF,0XD8处
+			//pbuf len:jpeg_data_len*4-i
+			//res=f_write(f_jpg,pbuf,jpeg_data_len*4-i,&bwr); //save data into jpeg_buf0.file
+			//if(bwr!=(jpeg_data_len*4-i))res=0XFE; 
+		}
 	jpeg_data_len=0;
-
 	sw_ov2640_mode();		//切换为OV2640模式
-        
-	myfree(SRAMIN,f_jpg);
-  printf("%x\r\n", res);	
+	//OV2640_RGB565_Mode();	//RGB565模式 
+	//DCMI_DMA_Init((u32)&LCD->LCD_RAM,0,1,DMA_MemoryDataSize_HalfWord,DMA_MemoryInc_Disable);//DCMI DMA配置           
+	//myfree(SRAMIN,f_jpg);
+  //printf("%x\r\n", res);	
 	return res;
 }
 

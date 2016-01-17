@@ -12,8 +12,13 @@ extern OS_EVENT * led_event;
 extern void *dht11_q[DHT11SIZE];
 extern OS_EVENT * dht11_event;
 
+/*camera's message queue*/
+#define CAMERASIZE 6
+extern void *camera_q[CAMERASIZE];
+extern OS_EVENT * camera_event;
+
 /*send消息队列*/
-#define SENDSIZE 10
+#define SENDSIZE 20
 extern void *tcp_send_q[SENDSIZE];
 extern OS_EVENT * tcp_send_event;
 
