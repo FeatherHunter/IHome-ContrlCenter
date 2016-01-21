@@ -30,40 +30,34 @@ extern OS_STK * TCP_CLIENT_CONNECT_TASK_STK;
 void tcp_client_connect(void *arg);
 
 /*tcp server*/
-#define TCPSERVER_PRIO		7
+#define TCPSERVER_PRIO		8
 #define TCPSERVER_STK_SIZE	300
 extern OS_STK * TCPSERVER_TASK_STK;
 void tcp_server_task(void *arg);
 
 /*TCP client receive message task*/
-#define TCP_CLIENT_RECV_TASK_PRIO       		8
+#define TCP_CLIENT_RECV_TASK_PRIO       		9
 #define TCP_CLIENT_RECV_STK_SIZE  		    128
 extern OS_STK * TCP_CLIENT_RECV_TASK_STK;	
 void tcp_client_recv(void *arg);
 
 /*TCP server receive message task*/
-#define TCPSERVER_RECV_TASK_PRIO       		9
+#define TCPSERVER_RECV_TASK_PRIO       		10
 #define TCPSERVER_RECV_STK_SIZE  		    128
 extern OS_STK * TCPSERVER_RECV_TASK_STK;	
 void tcp_server_recv(void *arg);
 
 /*处理控制中心接收到的消息*/
-#define CLIENT_HANDLE_TASK_PRIO       		10
+#define CLIENT_HANDLE_TASK_PRIO       		11
 #define CLIENT_HANDLE_STK_SIZE  		    128
 extern OS_STK * CLIENT_HANDLE_TASK_STK;	
 void tcp_handle_task(void *arg);
 
 /*tcp send msg task*/
-#define TCP_SEND_TASK_PRIO       	11
+#define TCP_SEND_TASK_PRIO       	12
 #define TCP_SEND_STK_SIZE  		    128
 extern OS_STK * TCP_SEND_TASK_STK;	
 void tcp_send_task(void *arg);
-
-/*video tcp server*/
-#define VIDEOSERVER_PRIO		7
-#define VIDEOSERVER_STK_SIZE	300
-extern OS_STK * VIDEOSERVER_TASK_STK;
-void video_server_task(void *arg);
 
 /*LED任务*/
 #define LED_TASK_PRIO		17

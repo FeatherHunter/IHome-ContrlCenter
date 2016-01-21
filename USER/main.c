@@ -40,7 +40,7 @@ int main(void)
 	uart_init(115200);    	//串口波特率设置
 	usmart_dev.init(84); 	//初始化USMART
 	LED_Init();  			//LED初始化
-	KEY_Init();  			//按键初始化
+	//KEY_Init();  			//按键初始化
 	LCD_Init();  			//LCD初始化
 	BEEP_Init();				//蜂鸣器初始化
 	FSMC_SRAM_Init();		//SRAM初始化
@@ -67,6 +67,7 @@ int main(void)
 		LCD_Fill(30,50,240,66,WHITE);//清除显示	     
 		delay_ms(200);				  
 	}  
+#endif
 	DEBUG_LCD(20,40,"DHT11 initing....", RED);
 	while(DHT11_Init())//温湿度传感器
 	{
@@ -76,7 +77,7 @@ int main(void)
 		delay_ms(250);
 	}
 	DEBUG_LCD(20,40, "                 ", RED);
-#endif
+
 	
 	res=f_mkdir("0:/PHOTO");		//创建PHOTO文件夹
 	if(res!=FR_EXIST&&res!=FR_OK) 	//发生了错误

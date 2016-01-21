@@ -3,11 +3,11 @@
 #include "sys.h"   
 
 //IO方向设置
-#define DHT11_IO_IN()  {GPIOG->MODER&=~(3<<(9*2));GPIOG->MODER|=0<<9*2;}	//PG9输入模式
-#define DHT11_IO_OUT() {GPIOG->MODER&=~(3<<(9*2));GPIOG->MODER|=1<<9*2;} 	//PG9输出模式 
+#define DHT11_IO_IN()  {GPIOA->MODER&=~(3<<(0*2));GPIOA->MODER|=0<<0*2;}	//PG9输入模式
+#define DHT11_IO_OUT() {GPIOA->MODER&=~(3<<(0*2));GPIOA->MODER|=1<<0*2;} 	//PG9输出模式 
 //IO操作函数											   
-#define	DHT11_DQ_OUT PGout(9) //数据端口	PG9 
-#define	DHT11_DQ_IN  PGin(9)  //数据端口	PG9 
+#define	DHT11_DQ_OUT PAout(0) //数据端口	PG9 
+#define	DHT11_DQ_IN  PAin(0)  //数据端口	PG9 
 
 u8 DHT11_Init(void);									//初始化DHT11
 u8 DHT11_Read_Data(u8 *temp,u8 *humi);//读取温湿度

@@ -127,7 +127,7 @@ u8 DHT11_Read_Data(u8 *temp,u8 *humi)
  
 /**
  * @Function u8 DHT11_Init(void)
- * @description 初始化DHT11的IO口 DQ 同时检测DHT11的存在
+ * @description 初始化DHT11的IO口 DQ 同时检测DHT11的存在,暂时使用PB12
  * @Return 返回1:不存在
  *				 返回0:存在 
  */
@@ -135,15 +135,15 @@ u8 DHT11_Init(void)
 {
 	GPIO_InitTypeDef  GPIO_InitStructure;
 
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE);//使能GPIOG时钟
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);//使能GPIOG时钟
 
-  //GPIOG9初始化设置
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 ;
+  //GPIOB12初始化设置
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 ;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;			//普通输出模式
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;		//推挽输出
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	//50MHz
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;			//上拉
-  GPIO_Init(GPIOG, &GPIO_InitStructure);						//初始化
+  GPIO_Init(GPIOA, &GPIO_InitStructure);						//初始化
 	DHT11_Rst();
 	return DHT11_Check();
 }

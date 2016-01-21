@@ -867,10 +867,12 @@ ARM Macro Assembler    Page 14
               00000400 
               00000200 
               00000000 
-Command Line: --debug --xref --cpu=Cortex-M4.fp --apcs=interwork --depend=..\OB
-J\startup_stm32f40_41xxx.d -o..\OBJ\startup_stm32f40_41xxx.o -ID:\Keil_ARM\ARM\
-RV31\INC -ID:\Keil_ARM\ARM\CMSIS\Include --list=..\OBJ\startup_stm32f40_41xxx.l
-st ..\CORE\startup_stm32f40_41xxx.s
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
+erwork --depend=..\obj\startup_stm32f40_41xxx.d -o..\obj\startup_stm32f40_41xxx
+.o -IE:\Projects\IHome-ContrlCenter\USER\RTE -IC:\FeatherTools\Keil_v5\ARM\PACK
+\Keil\STM32F4xx_DFP\1.0.8\Device\Include -IC:\FeatherTools\Keil_v5\ARM\CMSIS\In
+clude --predefine="__UVISION_VERSION SETA 514" --predefine="STM32F40_41xxx SETA
+ 1" --list=..\obj\startup_stm32f40_41xxx.lst ..\CORE\startup_stm32f40_41xxx.s
 
 
 
@@ -1983,4 +1985,4 @@ Symbol: __use_two_region_memory
       None
 Comment: __use_two_region_memory unused
 3 symbols
-446 symbols in table
+448 symbols in table

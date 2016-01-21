@@ -35,9 +35,6 @@ OS_STK * TCPSERVER_TASK_STK;
 /*TCP server recv stk*/
 OS_STK * TCPSERVER_RECV_TASK_STK;	
 
-/*video server task stk*/
-OS_STK * VIDEOSERVER_TASK_STK;
-
 u8 user_addr[4];
 u8 video_addr[4];
 
@@ -54,11 +51,9 @@ INT8U tcp_server_init(void)
 	
 	TCPSERVER_RECV_TASK_STK    = mymalloc(SRAMEX, TCPSERVER_RECV_STK_SIZE*sizeof(OS_STK));
 	TCPSERVER_TASK_STK         = mymalloc(SRAMEX, TCPSERVER_STK_SIZE*sizeof(OS_STK));
-	VIDEOSERVER_TASK_STK       = mymalloc(SRAMEX, VIDEOSERVER_STK_SIZE*sizeof(OS_STK));
 	
 	OS_ENTER_CRITICAL();	//关中断
 	res = OSTaskCreate(tcp_server_task,(void*)0 ,(OS_STK*)&TCPSERVER_TASK_STK[TCPSERVER_STK_SIZE-1], TCPSERVER_PRIO); //创建TCP服务器线程
-	res += OSTaskCreate(video_server_task,(void*)0 ,(OS_STK*)&VIDEOSERVER_TASK_STK[VIDEOSERVER_STK_SIZE-1], VIDEOSERVER_PRIO);//创建视频服务器
 	res += OSTaskCreate(tcp_server_recv,(void*)0,(OS_STK*)&TCPSERVER_RECV_TASK_STK[TCPSERVER_RECV_STK_SIZE-1], TCPSERVER_RECV_TASK_PRIO);
 	OS_EXIT_CRITICAL();		//开中断
 	
@@ -110,20 +105,20 @@ void tcp_server_task(void *arg)
 				else
 				{
 					DEBUG("user is checked\r\n");
-					/*--------------发送任意信息给用户,确认连接状态------------------------------*/
-					msg_buf = mymalloc(SRAMEX, 7);
-					sprintf((char *)msg_buf, "server");
-					if(OSQPost(tcp_send_event, msg_buf) != OS_ERR_NONE)//为客户端信息
-					{
-							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
-					}	
-					msg_buf = mymalloc(SRAMEX, 4);//外部内存分配空间
-					sprintf((char *)msg_buf, "%c%c%c",
-																		COMMAND_PULSE,COMMAND_SEPERATOR,COMMAND_END);
-					if(OSQPost(tcp_send_event,msg_buf) != OS_ERR_NONE)
-					{
-							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
-					}
+//					/*--------------发送任意信息给用户,确认连接状态------------------------------*/
+//					msg_buf = mymalloc(SRAMEX, 7);
+//					sprintf((char *)msg_buf, "server");
+//					if(OSQPost(tcp_send_event, msg_buf) != OS_ERR_NONE)//为客户端信息
+//					{
+//							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+//					}	
+//					msg_buf = mymalloc(SRAMEX, 4);//外部内存分配空间
+//					sprintf((char *)msg_buf, "%c%c%c",
+//																		COMMAND_PULSE,COMMAND_SEPERATOR,COMMAND_END);
+//					if(OSQPost(tcp_send_event,msg_buf) != OS_ERR_NONE)
+//					{
+//							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
+//					}
 					OSTimeDlyHMSM(0,0,10,0);
 				}
 				OSTimeDlyHMSM(0,0,2,0);
@@ -132,50 +127,6 @@ void tcp_server_task(void *arg)
 		else
 		{
 			DEBUG("tcp_server_task accept error!\r\n");
-		}
-	}//end of while(1)
-}
-
-/**
- * @Function: void video_server_task(void *arg)
- * @Description: video server
- *       videoisConnected: a flag of accepting a user
- */
-void video_server_task(void *arg)
-{
-	err_t err;
-	static ip_addr_t ipaddr;
-	static u16_t 			port;
-	
-	LWIP_UNUSED_ARG(arg);
-	videoconn = netconn_new(NETCONN_TCP);  //创建一个TCP链接
-	err = netconn_bind(videoconn,IP_ADDR_ANY,VIDEO_SERVER_PORT);  //绑定端口 8080号端口
-	err = netconn_listen(videoconn);  		//进入监听模式
-	while (1) 
-	{
-		DEBUG("video accepting!\n");
-		//DEBUG_LCD(20, 240, "Video Accepting......      ", RED);//显示接收到的数据	
-		err = netconn_accept(videoconn,&video_server);  //接收连接请求
-		DEBUG("video accepted!\n");
-		if (err == ERR_OK)    //处理新连接的数据
-		{ 
-			netconn_getaddr(video_server,&ipaddr,&port,0); //获取远端IP地址和端口号
-			video_addr[3] = (uint8_t)(ipaddr.addr >> 24); 
-			video_addr[2] = (uint8_t)(ipaddr.addr>> 16);
-			video_addr[1] = (uint8_t)(ipaddr.addr >> 8);
-			video_addr[0] = (uint8_t)(ipaddr.addr);
-			DEBUG("主机%d.%d.%d.%d连接上视频服务器,主机端口号为:%d\r\n",video_addr[0], video_addr[1],video_addr[2],video_addr[3],port);
-			
-			video_isConnected = 1; //已经有链接上
-			OSTimeDlyHMSM(0,0,3,0);//等待身份验证
-			while(video_isConnected)//保持链接
-			{
-				OSTimeDlyHMSM(0,0,2,0);
-			}
-		}
-		else
-		{
-			DEBUG("video accept error!\r\n");
 		}
 	}//end of while(1)
 }
