@@ -61,18 +61,20 @@ void camera_task(void *arg)
 		u8 isServer = 1;
 	  INT8U err;
 		u8 * send_buf;
+	  u8 * startflag_buf;
+		u8 * endflag_buf;
 		u8* pbuf;
 		u16 i;
-		u16 j;
-		u16 k;
-		unsigned int temp;
-	  unsigned int quotient;
-		unsigned int remainder;
+		//u16 j;
+		//u16 k;
+		//unsigned int temp;
+	  //unsigned int quotient;
+		//unsigned int remainder;
 		unsigned int len;
 	  unsigned int count;
 		unsigned int jpegtimes;
 		unsigned int jpegremainder;
-		char length[10];
+		//char length[10];
 		char * msg_auth;
 	  char * msg_camera;
 	  DEBUG("camera task\r\n");
@@ -119,27 +121,7 @@ void camera_task(void *arg)
 					DEBUG("Camera TASK OSQPend error %s %d\n", __FILE__, __LINE__);
 					continue; //没有接收到指令
 				}
-				
-//				if(isServer == 1)
-//				{
-//					/*send msg as server*/
-//					send_buf = mymalloc(SRAMEX, 7);
-//					sprintf((char *)send_buf, "server");
-//					if(OSQPost(tcp_send_event,send_buf) != OS_ERR_NONE)//为客户端信息
-//					{
-//							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
-//					}		
-//				}
-//				else
-//				{
-//					/*send msg as server*/
-//					send_buf = mymalloc(SRAMEX, 7);
-//					sprintf((char *)send_buf, "client");
-//					if(OSQPost(tcp_send_event,send_buf) != OS_ERR_NONE)//为客户端信息
-//					{
-//							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
-//					}		
-//				}
+
 //				
 //				if(strcmp(msg_camera, CAMERA_ID) != 0)//make sure id's right
 //				{
@@ -156,27 +138,35 @@ void camera_task(void *arg)
 //					}
 //					continue;
 //				}
-				if(isServer == 1)
-				{
-					/*VIDEO_send start*/
-					send_buf = mymalloc(SRAMEX, 72); //64+8 状态指令最高上限
-					sprintf((char *)send_buf, "%c%c""%s%c""%s%c""%c%c%c",
+				/*VIDEO_send start*/
+				startflag_buf = mymalloc(SRAMEX, 72); //64+8 状态指令最高上限
+				sprintf((char *)startflag_buf, "%c%c""%s%c""%s%c""%c%c%c",
 																		COMMAND_VIDEO,COMMAND_SEPERATOR,
 																		slave,COMMAND_SEPERATOR,
 																		CAMERA_ID,COMMAND_SEPERATOR,
 																		VIDEO_START, COMMAND_SEPERATOR,COMMAND_END);
-					err = netconn_write(serverconn ,send_buf,strlen((char*)send_buf),NETCONN_COPY); //发送给用户开始传输的信息
-					if(err != ERR_OK)
-					{
-							DEBUG("发送失败\r\n");
-							video_isConnected = 0;
-					}
-					myfree(SRAMEX, send_buf);
-				}
-				
-				if(camera_start == VIDEO_START)
-				//while(camera_start == VIDEO_START)//start video
+				/*VIDEO_send stop*/
+				endflag_buf = mymalloc(SRAMEX, 72); //64+8 状态指令最高上限
+				sprintf((char *)endflag_buf, "%c%c""%s%c""%s%c""%c%c%c",
+																		COMMAND_VIDEO,COMMAND_SEPERATOR,
+																		slave,COMMAND_SEPERATOR,
+																		CAMERA_ID,COMMAND_SEPERATOR,
+																		VIDEO_STOP, COMMAND_SEPERATOR,COMMAND_END);
+				while(camera_start == VIDEO_START)//start video
 				{
+					
+					if(isServer == 1)
+					{
+						//send start
+						err = netconn_write(serverconn ,startflag_buf,strlen((char*)startflag_buf),NETCONN_COPY); //发送给用户开始传输的信息
+						if(err != ERR_OK)
+						{
+								DEBUG("发送失败\r\n");
+								video_isConnected = 0;
+						}
+						DEBUG("video send START to user\r\n");
+					}
+					
 					DCMI_Start(); 										//启动传输 
 					while(jpeg_data_ok!=1);						//等待第一帧图片采集完
 					jpeg_data_ok=2;										//忽略本帧图片,启动下一帧采集
@@ -200,7 +190,7 @@ void camera_task(void *arg)
 						if(isServer == 1)//as server sendto user
 						{
 							/*发送状态信息*/
-							send_buf = mymalloc(SRAMEX, 4096); //4096
+							send_buf = mymalloc(SRAMEX, 1100); //1100
 							sprintf((char *)send_buf, "%c%c%s%c""%s%c1000%c",
 																		COMMAND_VIDEO,COMMAND_SEPERATOR,slave, COMMAND_SEPERATOR,
 																		CAMERA_ID,COMMAND_SEPERATOR,COMMAND_SEPERATOR);
@@ -257,9 +247,15 @@ void camera_task(void *arg)
 //								DEBUG("发送失败\r\n");
 //								video_isConnected = 0;
 //							}
-							//camera_start = VIDEO_STOP;
 							OSTimeDlyHMSM(0,0,0,10);  //延时10ms
 							myfree(SRAMEX, send_buf);
+							err = netconn_write(serverconn ,endflag_buf,strlen((char*)endflag_buf),NETCONN_COPY); //sendto user video is end
+							if(err != ERR_OK)
+							{
+								DEBUG("发送失败\r\n");
+								video_isConnected = 0;
+							}
+							DEBUG("video send STOP to user\r\n");
 						}
 						else//as client sendto to server
 						{
@@ -282,51 +278,16 @@ void camera_task(void *arg)
 					{
 						DEBUG("ov2640_jpg_send, success:%x \r\n", res);
 					}
+					OSTimeDlyHMSM(0,0,0,10);  //延时50ms
 				}//end of while(camera_start == VIDEO_START)
 				
 				
 				
-				if(isServer == 1)
-				{
-					/*VIDEO_send stop*/
-					send_buf = mymalloc(SRAMEX, 72); //64+8 状态指令最高上限
-					sprintf((char *)send_buf, "%c%c""%s%c""%s%c""%c%c%c",
-																		COMMAND_VIDEO,COMMAND_SEPERATOR,
-																		slave,COMMAND_SEPERATOR,
-																		CAMERA_ID,COMMAND_SEPERATOR,
-																		VIDEO_STOP, COMMAND_SEPERATOR,COMMAND_END);
-					err = netconn_write(serverconn ,send_buf,strlen((char*)send_buf),NETCONN_COPY); //发送给用户开始传输的信息
-					if(err != ERR_OK)
-					{
-							DEBUG("发送失败\r\n");
-							video_isConnected = 0;
-					}
-					myfree(SRAMEX, send_buf);
-				}
-				else
-				{
-					/*send msg as server*/
-					send_buf = mymalloc(SRAMEX, 7);
-					sprintf((char *)send_buf, "client");
-					if(OSQPost(tcp_send_event,send_buf) != OS_ERR_NONE)//为客户端信息
-					{
-							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
-					}		
-					/*VIDEO_send stop*/
-					send_buf = mymalloc(SRAMEX, 72); //64+8 状态指令最高上限
-					sprintf((char *)send_buf, "%c%c""%s%c""%s%c""%c%c%c",
-																		COMMAND_VIDEO,COMMAND_SEPERATOR,
-																		slave,COMMAND_SEPERATOR,
-																		CAMERA_ID,COMMAND_SEPERATOR,
-																		VIDEO_STOP, COMMAND_SEPERATOR,COMMAND_END);
-					if(OSQPost(tcp_send_event,send_buf) != OS_ERR_NONE)
-					{
-							DEBUG("OSQPost ERROR %s %d\n", __FILE__, __LINE__);
-					}
-					DEBUG("video send STOP to user!!!!!!!!!\r\n");
-				}
 				
-				camera_start = VIDEO_STOP;
+				
+				myfree(SRAMEX, startflag_buf); //free start & end flag buf
+				myfree(SRAMEX, endflag_buf);
+				
 				OSTimeDlyHMSM(0,0,0,1);  //延时1ms
 	  }
 }
