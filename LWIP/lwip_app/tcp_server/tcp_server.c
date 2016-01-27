@@ -28,7 +28,6 @@ struct netconn *video_server;
 
 u8 isAccepted = 0;
 u8 isChecked  = 0;
-u8 video_isConnected = 0;
 
 /*TCP server task stk*/
 OS_STK * TCPSERVER_TASK_STK;

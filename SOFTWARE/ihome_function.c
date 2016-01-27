@@ -1,4 +1,3 @@
-#include "ihome_function.h"
 /**
  * @copyright 王辰浩(2015~2025) QQ：975559549
  * @Author Feather @version 2.0 @date 2016.1.4
@@ -8,6 +7,7 @@
  *		1.void led_task(void *pdata); //lamp task
  *		2.void dht11_task(void *pdata); //dht11 task about temp and humi
  */ 
+#include "ihome_function.h"
 #include "main.h"
 #include "lsens.h"
 #include "camera.h"
@@ -65,11 +65,6 @@ void camera_task(void *arg)
 		u8 * endflag_buf;
 		u8* pbuf;
 		u16 i;
-		//u16 j;
-		//u16 k;
-		//unsigned int temp;
-	  //unsigned int quotient;
-		//unsigned int remainder;
 		unsigned int len;
 	  unsigned int count;
 		unsigned int jpegtimes;
@@ -162,9 +157,23 @@ void camera_task(void *arg)
 						if(err != ERR_OK)
 						{
 								DEBUG("发送失败\r\n");
-								video_isConnected = 0;
+								isAccepted = 0;
+								camera_start = VIDEO_STOP;
+								continue;
 						}
 						DEBUG("video send START to user\r\n");
+					}
+					else
+					{
+						err = netconn_write(tcp_clientconn ,startflag_buf,strlen((char*)startflag_buf),NETCONN_COPY); //发送给用户开始传输的信息
+						if(err != ERR_OK)
+						{
+							DEBUG("发送失败\r\n");
+							isConnected = 0;
+							camera_start = VIDEO_STOP;
+							continue;
+						}
+						DEBUG("video send START to server\r\n");
 					}
 					
 					DCMI_Start(); 										//启动传输 
@@ -187,17 +196,17 @@ void camera_task(void *arg)
 						pbuf+=i;//偏移到0XFF,0XD8处
 						jpegtimes     = (jpeg_data_len*4-i) / 1000; //将整个文件分解成小文件
 						jpegremainder = (jpeg_data_len*4-i) % 1000; //余下来的也要发送出去
-						if(isServer == 1)//as server sendto user
-						{
-							/*发送状态信息*/
-							send_buf = mymalloc(SRAMEX, 1100); //1100
-							sprintf((char *)send_buf, "%c%c%s%c""%s%c1000%c",
+						
+						/*buffer's start*/
+						send_buf = mymalloc(SRAMEX, 1100); //1100
+						sprintf((char *)send_buf, "%c%c%s%c""%s%c1000%c",
 																		COMMAND_VIDEO,COMMAND_SEPERATOR,slave, COMMAND_SEPERATOR,
 																		CAMERA_ID,COMMAND_SEPERATOR,COMMAND_SEPERATOR);
-							len = strlen(send_buf);
-							DEBUG("camera led:%d\r\n", len);
-							//for(count = 0; count < jpegtimes; count++)
-							for(count = 0; count < jpegtimes; count++)
+						len = strlen(send_buf);
+						
+						if(isServer == 1)//as server sendto user
+						{
+							for(count = 0; count < (jpegtimes-30); count++)
 							{
 								DEBUG("camera task send to user：%d\r\n", count);
 								memcpy(send_buf + len, pbuf, 1000); //pbuf开始的4000字节存入send_buf 头信息之后
@@ -209,64 +218,55 @@ void camera_task(void *arg)
 								if(err != ERR_OK)
 								{
 									DEBUG("发送失败\r\n");
-									video_isConnected = 0;
+									isAccepted = 0;
+									camera_start = VIDEO_STOP;
+									break;
 								}
-								OSTimeDlyHMSM(0,0,0,20);  //延时10ms
+								OSTimeDlyHMSM(0,0,0,10);  //延时10ms
 							}
-							
-//							quotient = jpegremainder;
-//							j = 0;
-//							while(quotient > 0)
-//							{
-//								remainder = quotient % 10;
-//								quotient  = quotient / 10;
-//								length[j++] = remainder;
-//							}
-//							length[j] = '\0';
-//							DEBUG("remainder %d %s \r\n", jpegremainder, length);
-//							for(k = 0; k < j / 2; k++)
-//							{
-//								temp = length[j - 1 - k];
-//								length[j - 1 - k] = length[k];
-//								length[k] = temp;
-//							}
-//							
-//							sprintf((char *)send_buf, "%c%c%s%c""%s%c%s%c",
-//																		COMMAND_VIDEO,COMMAND_SEPERATOR,slave, COMMAND_SEPERATOR,
-//																		CAMERA_ID,COMMAND_SEPERATOR,length, COMMAND_SEPERATOR);
-//							len = strlen(send_buf);
-//							
-//							DEBUG("camera task send to user：remainder %s \r\n", length);
-//							/*send remainder*/
-//							memcpy(send_buf + len, pbuf, jpegremainder); //pbuf开始的4000字节存入send_buf 头信息之后
-//							*(send_buf + len + jpegremainder) = COMMAND_END;
-//							*(send_buf + len + jpegremainder + 1) = '\0';
-//							err = netconn_write(serverconn ,send_buf, len + jpegremainder + 2,NETCONN_COPY);
-//							if(err != ERR_OK)
-//							{
-//								DEBUG("发送失败\r\n");
-//								video_isConnected = 0;
-//							}
-							OSTimeDlyHMSM(0,0,0,10);  //延时10ms
-							myfree(SRAMEX, send_buf);
 							err = netconn_write(serverconn ,endflag_buf,strlen((char*)endflag_buf),NETCONN_COPY); //sendto user video is end
 							if(err != ERR_OK)
 							{
 								DEBUG("发送失败\r\n");
-								video_isConnected = 0;
+								isAccepted = 0;
+								camera_start = VIDEO_STOP;
+								continue;
 							}
 							DEBUG("video send STOP to user\r\n");
 						}
 						else//as client sendto to server
 						{
-							 
-							
-							
-						}
-						//pbuf len:jpeg_data_len*4-i
-						//res=f_write(f_jpg,pbuf,jpeg_data_len*4-i,&bwr); //save data into jpeg_buf0.file
-						//if(bwr!=(jpeg_data_len*4-i))res=0XFE; 
+							for(count = 0; count < (jpegtimes-30); count++)
+							{
+								DEBUG("camera task send to user：%d\r\n", count);
+								memcpy(send_buf + len, pbuf, 1000); //pbuf开始的4000字节存入send_buf 头信息之后
+								*(send_buf + len + 1000) = COMMAND_END;
+								*(send_buf + len + 1001) = '\0';
+							 /*send_buf not send_buf + len*/
+								err = netconn_write(tcp_clientconn ,send_buf, len + 1001,NETCONN_COPY); //packet 4000byte into a packet
+								pbuf += 1000;
+								if(err != ERR_OK)
+								{
+									DEBUG("发送失败\r\n");
+									isAccepted = 0;
+									camera_start = VIDEO_STOP;
+									break;
+								}
+								OSTimeDlyHMSM(0,0,0,10);  //延时10ms
+							}
+							err = netconn_write(tcp_clientconn ,endflag_buf,strlen((char*)endflag_buf),NETCONN_COPY); //sendto user video is end
+							if(err != ERR_OK)
+							{
+								DEBUG("发送失败\r\n");
+								isAccepted = 0;
+								camera_start = VIDEO_STOP;
+								continue;
+							}
+							DEBUG("video send STOP to user\r\n");
+						}//end of if(isServer)
+						myfree(SRAMEX, send_buf);
 					}
+					
 					jpeg_data_len=0;
 					sw_ov2640_mode();		//切换为OV2640模式
 
@@ -280,11 +280,7 @@ void camera_task(void *arg)
 					}
 					OSTimeDlyHMSM(0,0,0,10);  //延时50ms
 				}//end of while(camera_start == VIDEO_START)
-				
-				
-				
-				
-				
+
 				myfree(SRAMEX, startflag_buf); //free start & end flag buf
 				myfree(SRAMEX, endflag_buf);
 				

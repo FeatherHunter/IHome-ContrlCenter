@@ -6,6 +6,8 @@
 extern u8 isConnected;
 extern u8 isAuthed;
 
+extern struct netconn *tcp_clientconn;
+
 extern u8 tcp_client_flag;		//TCP客户端数据发送标志位
 
 INT8U tcp_client_init(void);  //tcp客户端初始化(创建tcp客户端线程)

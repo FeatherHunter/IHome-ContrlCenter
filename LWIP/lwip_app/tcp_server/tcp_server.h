@@ -5,7 +5,6 @@
 
 extern u8 isAccepted;
 extern u8 isChecked;
-extern u8 video_isConnected;
 extern struct netconn *serverconn;
 extern struct netconn *video_server;
 
